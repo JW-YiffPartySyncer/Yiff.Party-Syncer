@@ -296,12 +296,30 @@ public class WorkerPatreonUpdater implements Runnable {
 	 *                     yiff.party
 	 */
 	private void updatePosts(String strName, String strHref, String strID, String strTitle, String strTimestamp) {
+		// Check if entry already exists
 		try {
-			statement.executeUpdate("INSERT INTO posts (patreon, name, href, post, date) VALUES (" + iPatreon + ", '" + strName + "', '" + strHref + "', '" + strID + "', '"
-					+ strTimestamp + "') ON DUPLICATE KEY UPDATE ID = ID");
-		} catch (SQLException e) {
-			bSuccess = false;
-			e.printStackTrace();
+			resultSet = statement.executeQuery("SELECT * FROM posts WHERE patreon = " + iPatreon + " AND href = " + strHref);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		boolean bFound = false;
+		if (resultSet != null) {
+			try {
+				if (resultSet.next()) {
+					bFound = true;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		if (!bFound) {
+			try {
+				statement.executeUpdate("INSERT INTO posts (patreon, name, href, post, date) VALUES (" + iPatreon + ", '" + strName + "', '" + strHref + "', '" + strID + "', '"
+						+ strTimestamp + "') ON DUPLICATE KEY UPDATE ID = ID");
+			} catch (SQLException e) {
+				bSuccess = false;
+				e.printStackTrace();
+			}
 		}
 	}
 
