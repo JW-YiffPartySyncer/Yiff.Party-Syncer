@@ -57,3 +57,8 @@ or you check the links that the Userscript has grabbed from the frontpage with t
 With "Yes" and "No" you can decide if you want to keep the selected, grabbed patreon for future tracking.
 
 This has been tested on Windows 10 with the Oracle JDK 1.8
+
+-------------------------------------------------------------------------------
+
+**TODO:**
+- Fix excluded patreon pages
