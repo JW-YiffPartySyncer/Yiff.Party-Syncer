@@ -1,6 +1,12 @@
 # Yiff.Party-Syncer
 A grabber for yiff.party written in java
 
+# Pre-requisites
+* A fully set up Java IDE. I work with Eclipse.
+* A complete webserver package like XAMPP.
+- You need the SQL Server for storing metadata
+- If you want to use the Frontpage userscript grabber, you also need the webserver component
+
 # Steps to get your own instance up and running
 **Step 0: Clone the repo**
 
@@ -22,7 +28,7 @@ Look through it, the class is fully commented.
 YOU WILL NEED TO INCLUDE THE RIGHT CONNECTOR FOR YOUR DATABASE INTO YOUR PROJECT.
 Logic.OUtil has been configured to work with the mysql JDBC connection, but it is **NOT** included in this project.
 
-**Step 4 (optional): set up the yiff.party frontpage grabber UserScript
+**Step 4 (optional): set up the yiff.party frontpage grabber UserScript**
 
 The yiffparty.js Userscript refreshed the frontpage of Yiff.Party to look at all patreons which have been updated and writes those in the DB.
 This userscript also needs a webserver for the file www/postdata.php to run in. Cause I couldn't figure out how to post data from JS to MySQL.
