@@ -10,7 +10,7 @@ package Logic;
  *
  */
 public class Config {
-	public String strVersion = "0.1.1";
+	public String strVersion = "0.1.2";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -29,7 +29,7 @@ public class Config {
 	// How many download files should be buffered by the DownloadManager
 	// Anything above 20 seems to have diminishing returns because the SQL query
 	// will get bigger the more objects we try to cache.
-	public int iDLBuffer = 25;
+	public int iDLBuffer = 20;
 
 	// DownloadWorker config
 	// How many seconds to wait after a download has failed
@@ -40,4 +40,6 @@ public class Config {
 	public int iPatreonCheckTimeout = (1000 * 60 * 60 * 24); // 1 day
 	// Timeout for rechecking if yiff.party is down while we checked a patreon
 	public int iPatreonCheckFailedTimeout = (1000 * 60 * 60 * 1); // 1 hour
+	// Wait time in between consecutive checks
+	public int iPatreonWaitTimeout = (1000 * 60); // 1 second
 }

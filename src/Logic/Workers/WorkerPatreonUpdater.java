@@ -96,10 +96,11 @@ public class WorkerPatreonUpdater implements Runnable {
 			}
 			if (!bSuccess) {
 				try {
-					System.out.println("WorkerPatreonUpdater: Wait 1m for next patreon site update");
+					System.out.println("WorkerPatreonUpdater: Wait " + (oMain.oConf.iPatreonWaitTimeout / 1000)
+							+ ((oMain.oConf.iPatreonWaitTimeout / 1000) == 1 ? "second" : "seconds") + " for next patreon site update");
 					strStatus = "Idle";
 					lTimestamp = System.currentTimeMillis();
-					Thread.sleep(1000 * 60);
+					Thread.sleep(oMain.oConf.iPatreonWaitTimeout);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

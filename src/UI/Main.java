@@ -110,7 +110,7 @@ public class Main {
 		frmYiffpartySyncer.setTitle("Yiff.Party syncer");
 		frmYiffpartySyncer.setBounds(100, 100, 881, 402);
 		frmYiffpartySyncer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmYiffpartySyncer.getContentPane().setLayout(new MigLayout("", "[grow][grow]", "[][][][][][][][][][][grow][][][]"));
+		frmYiffpartySyncer.getContentPane().setLayout(new MigLayout("", "[][grow]", "[][][][][][][][][][][grow][][][]"));
 
 		JLabel lblNewLabel = new JLabel("Do you want to download:");
 		frmYiffpartySyncer.getContentPane().add(lblNewLabel, "cell 0 0,alignx trailing");
