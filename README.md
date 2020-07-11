@@ -5,21 +5,25 @@ A grabber for yiff.party written in java
 **Step 0: Clone the repo**
 
 **Step 1: get your SQL Server up and running**
+
 Currently, Yiff.Party Syncer needs a SQL Server to store patreon and file metadata.
 Set up your SQL Server, import the yiffparty.sql into your server.
 This will create a database named yiffparty with three empty tables.
 
 **Step 2: create a user for Yiff.Party Syncer in your DB**
+
 Create a user with your favourite database management tool, and grant it permissions to do stuff in the yiffparty database.
 It's best to log in with the user and test if it can create, alter and delete stuff.
 
 **Step 3: edit configuration in Yiff.Party Syncer**
+
 Currently all configuration is hardcoded in the Logic.Config class.
 Look through it, the class is fully commented.
 YOU WILL NEED TO INCLUDE THE RIGHT CONNECTOR FOR YOUR DATABASE INTO YOUR PROJECT.
 Logic.OUtil has been configured to work with the mysql JDBC connection, but it is **NOT** included in this project.
 
 **Step 4 (optional): set up the yiff.party frontpage grabber UserScript
+
 The yiffparty.js Userscript refreshed the frontpage of Yiff.Party to look at all patreons which have been updated and writes those in the DB.
 This userscript also needs a webserver for the file www/postdata.php to run in. Cause I couldn't figure out how to post data from JS to MySQL.
 Paste the postdata.php in the webroot of a webserver running on localhost. edit postdata.php and enter the credentials of the SQL User we set up beforehand.
