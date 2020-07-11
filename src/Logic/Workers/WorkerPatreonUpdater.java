@@ -298,7 +298,7 @@ public class WorkerPatreonUpdater implements Runnable {
 	private void updatePosts(String strName, String strHref, String strID, String strTitle, String strTimestamp) {
 		// Check if entry already exists
 		try {
-			resultSet = statement.executeQuery("SELECT * FROM posts WHERE patreon = " + iPatreon + " AND href = " + strHref);
+			resultSet = statement.executeQuery("SELECT * FROM posts WHERE patreon = " + iPatreon + " AND href = '" + strHref + "'");
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
