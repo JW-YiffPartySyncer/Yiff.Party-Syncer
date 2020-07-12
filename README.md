@@ -62,3 +62,4 @@ This has been tested on Windows 10 with the Oracle JDK 1.8
 
 **TODO:**
 - Fix excluded patreon pages
+- See if we can support downloads from different websites that are linked in patreon posts
