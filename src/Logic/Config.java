@@ -10,7 +10,7 @@ package Logic;
  *
  */
 public class Config {
-	public String strVersion = "0.1.2";
+	public String strVersion = "0.1.3";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -32,8 +32,10 @@ public class Config {
 	public int iDLBuffer = 20;
 
 	// DownloadWorker config
-	// How many seconds to wait after a download has failed
+	// How many seconds to wait after a download has failed to continue with the next download item
 	public int iDLWFailTimeout = 1;
+	// How long to wait for a single download to retry again
+	public int iDLWRetryTimeout = (1000 * 60 * 15); // 15 minutes
 
 	// PatreonUpdater config
 	// Timeout for checking all tracked patreons for new posts

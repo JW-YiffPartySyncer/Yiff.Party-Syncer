@@ -101,7 +101,7 @@ public class WorkerDownloadManager implements Runnable {
 		DownloadObject DO = new DownloadObject();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT * FROM posts WHERE downloaded = FALSE AND last_checked < " + (System.currentTimeMillis() - (1000 * 60 * 15)));
+		sb.append("SELECT * FROM posts WHERE downloaded = FALSE AND last_checked < " + (System.currentTimeMillis() - oMain.oConf.iDLWRetryTimeout));
 		for (int i = 0; i < aDOs.size(); i++) {
 			sb.append(" AND ID != " + aDOs.get(i).ID);
 		}

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         yiff.party
 // @namespace    *yiff.party*
-// @version      0.1
+// @version      0.1.1
 // @description  Helper tool to sync Yiff.Party stuff
 // @author       JW
 // @match        *yiff.party*
@@ -75,8 +75,7 @@ function scanRecentActivity() {
 }
 
 /*
-	Runs stuff once before script execution
-	TODO: this stuff doesnt work...
+	Currently empty. Used to set up debugging stuff.
 */
 function runOnce() {
 	console.log("yiff.party runOnce");
@@ -85,7 +84,5 @@ function runOnce() {
 }
 
 console.log("yiff.party helper loaded");
-console.log("Waiting till page fully loaded");
-window.addEventListener('load', function () {
-  runOnce();
-})
+console.log("Waiting 60 seconds");
+runOnce();
