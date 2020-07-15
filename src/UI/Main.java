@@ -30,6 +30,7 @@ import Logic.Workers.WorkerDownloadManager;
 import Logic.Workers.WorkerPatreonUpdater;
 import Logic.Workers.WorkerUIUpdater;
 import net.miginfocom.swing.MigLayout;
+import javax.swing.JCheckBox;
 
 /**
  * 
@@ -55,6 +56,7 @@ public class Main {
 	private JLabel lblDownloads = new JLabel("NULL");
 	private JLabel lblDownloadBuffer = new JLabel("NULL");
 	private JLabel lblPatreonParser = new JLabel("NULL");
+	private JCheckBox chckbxAutoOpen = new JCheckBox("Auto-open on decision");
 
 	private WorkerPatreonUpdater oPatreonUpdater = new WorkerPatreonUpdater(this);
 	private WorkerDownloadManager oDownloadManager = new WorkerDownloadManager(this);
@@ -156,7 +158,7 @@ public class Main {
 				open();
 			}
 		});
-		frmYiffpartySyncer.getContentPane().add(btnNewButton_2, "cell 1 1");
+		frmYiffpartySyncer.getContentPane().add(btnNewButton_2, "flowx,cell 1 1");
 
 		JLabel lblNewLabel_1 = new JLabel("Manually add to watch:");
 		lblNewLabel_1.setToolTipText("Add a Patreon manually.\r\nLink needs to be a creator main page link, for example\r\n\"https://yiff.party/patreon/xxxxxxx\"");
@@ -232,6 +234,9 @@ public class Main {
 		});
 		btnRemThread.setFont(new Font("Monospaced", Font.PLAIN, 10));
 		frmYiffpartySyncer.getContentPane().add(btnRemThread, "cell 0 9");
+		
+		chckbxAutoOpen.setToolTipText("If checked, the next queued Patreon to Check will automatically open in the default OS Browser. Basically replaces the Button \"Open in Browser\"");
+		frmYiffpartySyncer.getContentPane().add(chckbxAutoOpen, "cell 1 1");
 
 		connection = OUtil.connectToMysql("localhost", "yiffparty", "client", "keins");
 		if (connection != null) {
@@ -284,6 +289,9 @@ public class Main {
 			}
 		}
 		next();
+		if(chckbxAutoOpen.isSelected()) {
+			open();
+		}
 	}
 
 	/**
