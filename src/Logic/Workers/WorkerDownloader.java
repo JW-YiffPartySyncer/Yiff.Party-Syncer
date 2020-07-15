@@ -42,7 +42,7 @@ public class WorkerDownloader implements Runnable {
 
 	public String strStatus = "NULL";
 	public long lTimestamp = System.currentTimeMillis();
-	
+
 	private boolean bRunning = false;
 	public boolean bWorking = true;
 
@@ -114,8 +114,10 @@ public class WorkerDownloader implements Runnable {
 					if (success) {
 						// If the downloaded file is a PNG, convert it to high quality JPG. Cause PNGs
 						// are *big*
-						if (DO.strPath.substring(DO.strPath.lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
-							success = convert(DO.strPath);
+						if (oMain.oConf.bDLWConvertPNGs) {
+							if (DO.strPath.substring(DO.strPath.lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
+								success = convert(DO.strPath);
+							}
 						}
 						if (success) {
 							updatePost(DO, true, false);
@@ -178,7 +180,7 @@ public class WorkerDownloader implements Runnable {
 			ImageWriter writer = iter.next();
 			ImageWriteParam iwp = writer.getDefaultWriteParam();
 			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-			iwp.setCompressionQuality(0.95f);
+			iwp.setCompressionQuality(oMain.oConf.fDLWJPGQuality);
 			writer.setOutput(ImageIO.createImageOutputStream(output));
 			writer.write(null, new IIOImage(result, null, null), iwp);
 			writer.dispose();
@@ -235,7 +237,7 @@ public class WorkerDownloader implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Set bRunning to false to stop work after current download
 	 */

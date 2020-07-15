@@ -10,7 +10,7 @@ package Logic;
  *
  */
 public class Config {
-	public String strVersion = "0.2.1";
+	public String strVersion = "0.2.2";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -33,10 +33,15 @@ public class Config {
 	public int iDLBufferMultiplier = 5;
 
 	// DownloadWorker config
-	// How many seconds to wait after a download has failed to continue with the next download item
+	// How many seconds to wait after a download has failed to continue with the
+	// next download item
 	public int iDLWFailTimeout = 1;
 	// How long to wait for a single download to retry again
 	public int iDLWRetryTimeout = (1000 * 60 * 15); // 15 minutes
+	// Should we convert PNGs to JPegs?
+	public boolean bDLWConvertPNGs = true;
+	// Quality of the converted JPGs. 0.95f = 95% JPG Quality
+	public float fDLWJPGQuality = 0.95f;
 
 	// PatreonUpdater config
 	// Timeout for checking all tracked patreons for new posts
