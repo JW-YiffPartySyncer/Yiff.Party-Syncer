@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         yiff.party
 // @namespace    *yiff.party*
-// @version      0.1.1
+// @version      0.1.2
 // @description  Helper tool to sync Yiff.Party stuff
 // @author       JW
 // @match        *yiff.party*
@@ -54,7 +54,6 @@ function scanRecentActivity() {
 	var splitted = markup.split("\n");
 	
 	var i = 0;
-	var counter = 1;
 	try {
 		for( i = 0; i < splitted.length; i++) {
 			$.ajax({
@@ -63,10 +62,9 @@ function scanRecentActivity() {
 			crossDomain: true,
 			data : { markup : splitted[i], part : i, timestamp : currentTime },// passing the values
 			success: function(res){  
-				console.log(counter + "/" + splitted.length);
+				console.log(i + "/" + splitted.length);
 				}
 			});
-			counter++;
 		}
 	} catch (e) {
 		console.log(e);

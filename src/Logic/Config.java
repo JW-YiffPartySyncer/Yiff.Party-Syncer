@@ -10,7 +10,7 @@ package Logic;
  *
  */
 public class Config {
-	public String strVersion = "0.1.3";
+	public String strVersion = "0.1.4";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -29,7 +29,7 @@ public class Config {
 	// How many download files should be buffered by the DownloadManager
 	// Anything above 20 seems to have diminishing returns because the SQL query
 	// will get bigger the more objects we try to cache.
-	public int iDLBuffer = 20;
+	public int iDLBuffer = (iNumDLWorkers * 5);
 
 	// DownloadWorker config
 	// How many seconds to wait after a download has failed to continue with the next download item

@@ -6,8 +6,10 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -259,25 +261,43 @@ public class Main {
 	 */
 	private void add() {
 		if (!textFieldManual.getText().equals("")) {
+			String strLink = textFieldManual.getText();
+			URL u;
+			Boolean bSuccess = true;
 			try {
-				resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE link = '" + textFieldManual.getText() + "'");
-			} catch (SQLException e) {
+				u = new URL(strLink);
+				u.toURI();
+			} catch (MalformedURLException e1) {
+				bSuccess = false;
+				e1.printStackTrace();
+			} catch (URISyntaxException e) {
+				bSuccess = false;
 				e.printStackTrace();
 			}
-			if (resultSet != null) {
+
+			if (bSuccess && strLink.contains("yiff.party/patreon")) {
 				try {
-					if (resultSet.next()) {
-						if (resultSet.getInt(1) == 0) {
-							statement.executeUpdate("INSERT INTO patreons (link, wanted) VALUES ('" + textFieldManual.getText() + "', 1)");
-						}
-					}
+					resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE link = '" + strLink + "'");
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				if (resultSet != null) {
+					try {
+						if (resultSet.next()) {
+							if (resultSet.getInt(1) == 0) {
+								statement.executeUpdate("INSERT INTO patreons (link, wanted) VALUES ('" + strLink + "', 1)");
+							} else {
+								statement.executeUpdate("UPDATE patreons SET wanted = 1 WHERE link = '" + strLink + "'");
+							}
+						}
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
-			textFieldManual.setText("");
 		}
+		textFieldManual.setText("");
 	}
 
 	/**
