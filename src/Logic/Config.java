@@ -10,7 +10,7 @@ package Logic;
  *
  */
 public class Config {
-	public String strVersion = "0.1.4";
+	public String strVersion = "0.2.1";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -25,11 +25,12 @@ public class Config {
 	// download parallelism.
 	// Please don't set too high, we don't want to DDoS yiff.party...
 	// 4 workers can reach 500+ MBit/s download bandwidth in best case
-	public int iNumDLWorkers = 4;
+	public int iNumDLWorkers = 1;
 	// How many download files should be buffered by the DownloadManager
 	// Anything above 20 seems to have diminishing returns because the SQL query
 	// will get bigger the more objects we try to cache.
-	public int iDLBuffer = (iNumDLWorkers * 5);
+	public int iDLBuffer = 5;
+	public int iDLBufferMultiplier = 5;
 
 	// DownloadWorker config
 	// How many seconds to wait after a download has failed to continue with the next download item

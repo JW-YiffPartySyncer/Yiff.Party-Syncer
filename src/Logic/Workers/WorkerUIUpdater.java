@@ -29,6 +29,8 @@ public class WorkerUIUpdater implements Runnable {
 	@Override
 	public void run() {
 		int iCounter = 0;
+		main.updateDownloads();
+		main.updatePatreonTracking();
 		while (true) {
 			if (iCounter % 10 == 0) {
 				main.updateDownloads();

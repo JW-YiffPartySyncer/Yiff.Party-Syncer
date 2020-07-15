@@ -31,6 +31,7 @@ public class WorkerDownloadManager implements Runnable {
 	public ArrayList<WorkerDownloader> aDownloaders = new ArrayList<WorkerDownloader>();
 
 	private Main oMain;
+	private int iWorkerIndex = -1; // Last running worker in the aDownloaders ArrayList
 
 	public WorkerDownloadManager(Main oMain) {
 		this.oMain = oMain;
@@ -48,13 +49,9 @@ public class WorkerDownloadManager implements Runnable {
 			e.printStackTrace();
 		}
 
-		// Spawn download threads
+		// Spawn initial number of download threads
 		for (int i = 0; i < oMain.oConf.iNumDLWorkers; i++) {
-			WorkerDownloader oW = new WorkerDownloader(this, oMain);
-			aDownloaders.add(oW);
-			Thread oThread = new Thread(oW);
-			oThread.setName("WorkerDownloader " + i);
-			oThread.start();
+			startWorker();
 		}
 
 		while (true) {
@@ -69,6 +66,7 @@ public class WorkerDownloadManager implements Runnable {
 					}
 				}
 			}
+			checkWorkers();
 			try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
@@ -163,6 +161,46 @@ public class WorkerDownloadManager implements Runnable {
 			return false;
 		}
 		return false;
+	}
+	
+	/**
+	 * Attempts to start a worker thread
+	 */
+	public void startWorker() {
+		iWorkerIndex++;
+		WorkerDownloader oW = new WorkerDownloader(this, oMain);
+		aDownloaders.add(oW);
+		Thread oThread = new Thread(oW);
+		oThread.setName("WorkerDownloader " + iWorkerIndex);
+		oThread.start();
+		oMain.oConf.iDLBuffer = aDownloaders.size() * oMain.oConf.iDLBufferMultiplier;
+	}
+	
+	/**
+	 * Attempts to stop a worker thread
+	 */
+	public void stopWorker() {
+		if(iWorkerIndex != -1) {
+			aDownloaders.get(iWorkerIndex).stop();
+			iWorkerIndex--;
+		}
+	}
+	
+	/**
+	 * Periodically check aDownloaders for stopped workers
+	 */
+	private void checkWorkers() {
+		int iFound = -1;
+		for(int i = 0; i < aDownloaders.size(); i++) {
+			if(!aDownloaders.get(i).bWorking) {
+				iFound = i;
+				break;
+			}
+		}
+		if(iFound != -1) {
+			aDownloaders.remove(iFound);
+			oMain.oConf.iDLBuffer = aDownloaders.size() * oMain.oConf.iDLBufferMultiplier;
+		}
 	}
 
 }

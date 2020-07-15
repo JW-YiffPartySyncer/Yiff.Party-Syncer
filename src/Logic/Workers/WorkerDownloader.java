@@ -42,6 +42,9 @@ public class WorkerDownloader implements Runnable {
 
 	public String strStatus = "NULL";
 	public long lTimestamp = System.currentTimeMillis();
+	
+	private boolean bRunning = false;
+	public boolean bWorking = true;
 
 	private Main oMain;
 
@@ -65,7 +68,8 @@ public class WorkerDownloader implements Runnable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		while (true) {
+		bRunning = true;
+		while (bRunning) {
 			DownloadObject DO = null;
 			strStatus = "Idle";
 			lTimestamp = System.currentTimeMillis();
@@ -145,6 +149,7 @@ public class WorkerDownloader implements Runnable {
 				DO.finished = true;
 			}
 		}
+		bWorking = false;
 	}
 
 	/**
@@ -230,5 +235,11 @@ public class WorkerDownloader implements Runnable {
 			}
 		}
 	}
-
+	
+	/**
+	 * Set bRunning to false to stop work after current download
+	 */
+	public void stop() {
+		bRunning = false;
+	}
 }
