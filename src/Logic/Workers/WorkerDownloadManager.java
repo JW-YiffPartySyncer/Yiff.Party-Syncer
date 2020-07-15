@@ -31,7 +31,7 @@ public class WorkerDownloadManager implements Runnable {
 	public ArrayList<WorkerDownloader> aDownloaders = new ArrayList<WorkerDownloader>();
 
 	private Main oMain;
-	private int iWorkerIndex = -1; // Last running worker in the aDownloaders ArrayList
+	public int iWorkerIndex = -1; // Last running worker in the aDownloaders ArrayList
 
 	public WorkerDownloadManager(Main oMain) {
 		this.oMain = oMain;

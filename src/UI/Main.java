@@ -57,6 +57,7 @@ public class Main {
 	private JLabel lblDownloadBuffer = new JLabel("NULL");
 	private JLabel lblPatreonParser = new JLabel("NULL");
 	private JCheckBox chckbxAutoOpen = new JCheckBox("Auto-open on decision");
+	private JLabel lblDLThreads = new JLabel("NULL");
 
 	private WorkerPatreonUpdater oPatreonUpdater = new WorkerPatreonUpdater(this);
 	private WorkerDownloadManager oDownloadManager = new WorkerDownloadManager(this);
@@ -165,50 +166,55 @@ public class Main {
 		frmYiffpartySyncer.getContentPane().add(lblNewLabel_1, "cell 0 2,alignx trailing");
 
 		textFieldManual = new JTextField();
-		frmYiffpartySyncer.getContentPane().add(textFieldManual, "cell 1 2,growx");
+		frmYiffpartySyncer.getContentPane().add(textFieldManual, "flowx,cell 1 2,growx");
 		textFieldManual.setColumns(10);
-
-		JButton btnNewButton_3 = new JButton("Add");
-		btnNewButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				add();
-			}
-		});
-		frmYiffpartySyncer.getContentPane().add(btnNewButton_3, "cell 0 3");
 
 		JLabel lblNewLabel_2 = new JLabel("Status");
 		frmYiffpartySyncer.getContentPane().add(lblNewLabel_2, "cell 0 4");
 
 		JLabel lblPatreonTracking = new JLabel("Patreon Tracking:");
-		lblPatreonTracking.setToolTipText("Statistics about patreon tracking\r\n\r\nUnchecked: Number of Patreons that have been added by the UserScript and need manual checking\r\nTracking: Number of Patreons that are wanted and actively tracked\r\nUnwanted: Number of Patreons that are not wanted\r\n\r\nSynced: Number of up-to-date Patreons\r\nRetry: Number of Patreons that have failed their update and need re-checking");
+		lblPatreonTracking.setToolTipText(
+				"Statistics about patreon tracking\r\n\r\nUnchecked: Number of Patreons that have been added by the UserScript and need manual checking\r\nTracking: Number of Patreons that are wanted and actively tracked\r\nUnwanted: Number of Patreons that are not wanted\r\n\r\nSynced: Number of up-to-date Patreons\r\nRetry: Number of Patreons that have failed their update and need re-checking");
 		frmYiffpartySyncer.getContentPane().add(lblPatreonTracking, "cell 0 5");
-		lblPatreons.setToolTipText("Statistics about patreon tracking\r\n\r\nUnchecked: Number of Patreons that have been added by the UserScript and need manual checking\r\nTracking: Number of Patreons that are wanted and actively tracked\r\nUnwanted: Number of Patreons that are not wanted\r\n\r\nSynced: Number of up-to-date Patreons\r\nRetry: Number of Patreons that have failed their update and need re-checking");
+		lblPatreons.setFont(new Font("Monospaced", Font.PLAIN, 12));
+		lblPatreons.setToolTipText(
+				"Statistics about patreon tracking\r\n\r\nUnchecked: Number of Patreons that have been added by the UserScript and need manual checking\r\nTracking: Number of Patreons that are wanted and actively tracked\r\nUnwanted: Number of Patreons that are not wanted\r\n\r\nSynced: Number of up-to-date Patreons\r\nRetry: Number of Patreons that have failed their update and need re-checking");
 
 		frmYiffpartySyncer.getContentPane().add(lblPatreons, "cell 1 5");
 
 		JLabel lblNewLabel_3 = new JLabel("Downloads:");
-		lblNewLabel_3.setToolTipText("Statistics about all Downloads tracked by Yiff.Party Syncer\r\n\r\nIn DB: Number of total Downloads in Database\r\nDownloaded: Number of Downloads that are completed to disk\r\nFailed: Number of Downloads that have failed in certain ways. Will be retried at the end of the Download List\r\nFNF: FileNotFound, the Download is no longer available on Yiff.Party. Most likely the Creator got excluded.");
+		lblNewLabel_3.setToolTipText(
+				"Statistics about all Downloads tracked by Yiff.Party Syncer\r\n\r\nIn DB: Number of total Downloads in Database\r\nDownloaded: Number of Downloads that are completed to disk\r\nFailed: Number of Downloads that have failed in certain ways. Will be retried at the end of the Download List\r\nFNF: FileNotFound, the Download is no longer available on Yiff.Party. Most likely the Creator got excluded.");
 		frmYiffpartySyncer.getContentPane().add(lblNewLabel_3, "cell 0 6");
-		lblDownloads.setToolTipText("Statistics about all Downloads tracked by Yiff.Party Syncer\r\n\r\nIn DB: Number of total Downloads in Database\r\nDownloaded: Number of Downloads that are completed to disk\r\nFailed: Number of Downloads that have failed in certain ways. Will be retried at the end of the Download List\r\nFNF: FileNotFound, the Download is no longer available on Yiff.Party. Most likely the Creator got excluded.");
+		lblDownloads.setFont(new Font("Monospaced", Font.PLAIN, 12));
+		lblDownloads.setToolTipText(
+				"Statistics about all Downloads tracked by Yiff.Party Syncer\r\n\r\nIn DB: Number of total Downloads in Database\r\nDownloaded: Number of Downloads that are completed to disk\r\nFailed: Number of Downloads that have failed in certain ways. Will be retried at the end of the Download List\r\nFNF: FileNotFound, the Download is no longer available on Yiff.Party. Most likely the Creator got excluded.");
 
 		frmYiffpartySyncer.getContentPane().add(lblDownloads, "cell 1 6");
 
 		JLabel lblNewLabel_4 = new JLabel("Download Buffer:");
-		lblNewLabel_4.setToolTipText("Total/Unused - Maximum buffered downloads\r\n\r\nThis stat shows how many pending downloads are buffered.\r\nThe unused number represents how many buffers are free, the Total number represents how many buffers there are total.\r\nEvery Download Thread can use a buffer object, so at maximum the unused objects should amount to (Maximum Download Buffers - Amount of Download Threads)");
+		lblNewLabel_4.setToolTipText(
+				"Total/Unused - Maximum buffered downloads\r\n\r\nThis stat shows how many pending downloads are buffered.\r\nThe unused number represents how many buffers are free, the Total number represents how many buffers there are total.\r\nEvery Download Thread can use a buffer object, so at maximum the unused objects should amount to (Maximum Download Buffers - Amount of Download Threads)");
 		frmYiffpartySyncer.getContentPane().add(lblNewLabel_4, "cell 0 7");
-		lblDownloadBuffer.setToolTipText("Total/Unused - Maximum buffered downloads\r\n\r\nThis stat shows how many pending downloads are buffered.\r\nThe unused number represents how many buffers are free, the Total number represents how many buffers there are total.\r\nEvery Download Thread can use a buffer object, so at maximum the unused objects should amount to (Maximum Download Buffers - Amount of Download Threads)");
+		lblDownloadBuffer.setFont(new Font("Monospaced", Font.PLAIN, 12));
+		lblDownloadBuffer.setToolTipText(
+				"Total/Unused - Maximum buffered downloads\r\n\r\nThis stat shows how many pending downloads are buffered.\r\nThe unused number represents how many buffers are free, the Total number represents how many buffers there are total.\r\nEvery Download Thread can use a buffer object, so at maximum the unused objects should amount to (Maximum Download Buffers - Amount of Download Threads)");
 
 		frmYiffpartySyncer.getContentPane().add(lblDownloadBuffer, "cell 1 7");
 
 		JLabel lblNewLabel_5 = new JLabel("Patreon Parser:");
 		lblNewLabel_5.setToolTipText("Status of the WorkerPatreonUpdater Worker Thread. Idles for one minute between updates, to not create unnescessary load on yiff.party.");
 		frmYiffpartySyncer.getContentPane().add(lblNewLabel_5, "cell 0 8");
+		lblPatreonParser.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		lblPatreonParser.setToolTipText("Status of the WorkerPatreonUpdater Worker Thread. Idles for one minute between updates, to not create unnescessary load on yiff.party.");
 
 		frmYiffpartySyncer.getContentPane().add(lblPatreonParser, "cell 1 8");
 
 		JLabel lblNewLabel_6 = new JLabel("DL Threads:");
 		frmYiffpartySyncer.getContentPane().add(lblNewLabel_6, "flowx,cell 0 9");
+		
+		lblDLThreads.setFont(new Font("Monospaced", Font.PLAIN, 12));
+		frmYiffpartySyncer.getContentPane().add(lblDLThreads, "cell 1 9");
 
 		JScrollPane scrollPane = new JScrollPane();
 		frmYiffpartySyncer.getContentPane().add(scrollPane, "cell 0 10 2 1,grow");
@@ -216,7 +222,7 @@ public class Main {
 		listDownloaders.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
 		scrollPane.setViewportView(listDownloaders);
-		
+
 		JButton btnAddThread = new JButton("+");
 		btnAddThread.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -225,7 +231,7 @@ public class Main {
 		});
 		btnAddThread.setFont(new Font("Monospaced", Font.PLAIN, 10));
 		frmYiffpartySyncer.getContentPane().add(btnAddThread, "cell 0 9");
-		
+
 		JButton btnRemThread = new JButton("-");
 		btnRemThread.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -234,9 +240,18 @@ public class Main {
 		});
 		btnRemThread.setFont(new Font("Monospaced", Font.PLAIN, 10));
 		frmYiffpartySyncer.getContentPane().add(btnRemThread, "cell 0 9");
-		
-		chckbxAutoOpen.setToolTipText("If checked, the next queued Patreon to Check will automatically open in the default OS Browser. Basically replaces the Button \"Open in Browser\"");
+
+		chckbxAutoOpen.setToolTipText(
+				"If checked, the next queued Patreon to Check will automatically open in the default OS Browser. Basically replaces the Button \"Open in Browser\"");
 		frmYiffpartySyncer.getContentPane().add(chckbxAutoOpen, "cell 1 1");
+
+		JButton btnNewButton_3 = new JButton("Add");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				add();
+			}
+		});
+		frmYiffpartySyncer.getContentPane().add(btnNewButton_3, "cell 1 2");
 
 		connection = OUtil.connectToMysql("localhost", "yiffparty", "client", "keins");
 		if (connection != null) {
@@ -289,7 +304,7 @@ public class Main {
 			}
 		}
 		next();
-		if(chckbxAutoOpen.isSelected()) {
+		if (chckbxAutoOpen.isSelected()) {
 			open();
 		}
 	}
@@ -343,7 +358,7 @@ public class Main {
 	 * Reloads patreon tracking statistics
 	 */
 	public void updatePatreonTracking() {
-		String strResult = "";
+		StringBuilder sb = new StringBuilder();
 		Statement statementOwn = null;
 		try {
 			statementOwn = connection.createStatement();
@@ -354,7 +369,7 @@ public class Main {
 			try {
 				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 0");
 				if (resultSetOwn.next()) {
-					strResult = strResult + "Unchecked: " + resultSetOwn.getInt(1);
+					sb.append("Unchecked: " + resultSetOwn.getInt(1));
 				}
 				resultSetOwn.close();
 			} catch (Exception e) {
@@ -363,7 +378,7 @@ public class Main {
 			try {
 				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 1");
 				if (resultSetOwn.next()) {
-					strResult = strResult + "| Tracking: " + resultSetOwn.getInt(1);
+					sb.append("| Tracking: " + resultSetOwn.getInt(1));
 				}
 				resultSetOwn.close();
 			} catch (Exception e) {
@@ -372,7 +387,7 @@ public class Main {
 			try {
 				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 2");
 				if (resultSetOwn.next()) {
-					strResult = strResult + "| Unwanted: " + resultSetOwn.getInt(1);
+					sb.append("| Unwanted: " + resultSetOwn.getInt(1));
 				}
 				resultSetOwn.close();
 			} catch (Exception e) {
@@ -381,7 +396,7 @@ public class Main {
 			try {
 				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE success = 1");
 				if (resultSetOwn.next()) {
-					strResult = strResult + "| Status: " + resultSetOwn.getInt(1) + " synced / ";
+					sb.append("| Status: " + resultSetOwn.getInt(1) + " synced / ");
 				}
 				resultSetOwn.close();
 			} catch (Exception e) {
@@ -390,13 +405,13 @@ public class Main {
 			try {
 				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE success = 0 AND last_checked != 0");
 				if (resultSetOwn.next()) {
-					strResult = strResult + resultSetOwn.getInt(1) + " retry";
+					sb.append(resultSetOwn.getInt(1) + " retry");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		lblPatreons.setText(strResult);
+		lblPatreons.setText(sb.toString());
 		try {
 			statementOwn.close();
 		} catch (SQLException e) {
@@ -487,15 +502,16 @@ public class Main {
 			listActivityModel.addElement(oDownloadManager.aDownloaders.get(i).strStatus + ", since "
 					+ ((System.currentTimeMillis() - oDownloadManager.aDownloaders.get(i).lTimestamp) / 1000) + " seconds");
 		}
+		lblDLThreads.setText(oDownloadManager.aDownloaders.size() + " Threads active, " + (oDownloadManager.iWorkerIndex + 1) + " Threads wanted");
 	}
-	
+
 	/**
 	 * Attempts to spawn a new DownloadWorker
 	 */
 	private void addDLThread() {
 		oDownloadManager.startWorker();
 	}
-	
+
 	/**
 	 * Attempts to close a DownloadWorker after its current download
 	 */

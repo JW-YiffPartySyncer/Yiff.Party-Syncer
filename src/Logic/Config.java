@@ -10,7 +10,7 @@ package Logic;
  *
  */
 public class Config {
-	public String strVersion = "0.2.3";
+	public String strVersion = "0.2.4";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
