@@ -10,7 +10,7 @@ package Logic;
  *
  */
 public class Config {
-	public String strVersion = "0.2.4";
+	public String strVersion = "0.2.5";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -19,6 +19,10 @@ public class Config {
 
 	// Local save master folder
 	public String strSavepath = "W:\\Private\\yiffparty\\";
+	
+	// UI Configuration
+	// Auto-Open default state
+	public boolean bUIAutoOpen = true; 
 
 	// DownloadManager configuration
 	// How many download workers will be spawned. More download workers = higher

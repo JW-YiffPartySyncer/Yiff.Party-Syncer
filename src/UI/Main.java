@@ -105,6 +105,8 @@ public class Main {
 		Thread oThread4 = new Thread(oW4);
 		oThread4.setName("WorkerUIUpdater");
 		oThread4.start();
+		
+		chckbxAutoOpen.setSelected(oConf.bUIAutoOpen);
 	}
 
 	/**
