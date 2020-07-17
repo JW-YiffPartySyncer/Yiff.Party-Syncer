@@ -162,42 +162,46 @@ public class WorkerDownloadManager implements Runnable {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Attempts to start a worker thread
 	 */
 	public void startWorker() {
-		iWorkerIndex++;
-		WorkerDownloader oW = new WorkerDownloader(this, oMain);
-		aDownloaders.add(oW);
-		Thread oThread = new Thread(oW);
-		oThread.setName("WorkerDownloader " + iWorkerIndex);
-		oThread.start();
-		oMain.oConf.iDLBuffer = aDownloaders.size() * oMain.oConf.iDLBufferMultiplier;
+		// Hardcode a max of 6 download threads
+		// to not DDoS yiff.party with too many concurrent connections
+		if (iWorkerIndex < 6) {
+			iWorkerIndex++;
+			WorkerDownloader oW = new WorkerDownloader(this, oMain);
+			aDownloaders.add(oW);
+			Thread oThread = new Thread(oW);
+			oThread.setName("WorkerDownloader " + iWorkerIndex);
+			oThread.start();
+			oMain.oConf.iDLBuffer = aDownloaders.size() * oMain.oConf.iDLBufferMultiplier;
+		}
 	}
-	
+
 	/**
 	 * Attempts to stop a worker thread
 	 */
 	public void stopWorker() {
-		if(iWorkerIndex != -1) {
+		if (iWorkerIndex != -1) {
 			aDownloaders.get(iWorkerIndex).stop();
 			iWorkerIndex--;
 		}
 	}
-	
+
 	/**
 	 * Periodically check aDownloaders for stopped workers
 	 */
 	private void checkWorkers() {
 		int iFound = -1;
-		for(int i = 0; i < aDownloaders.size(); i++) {
-			if(!aDownloaders.get(i).bWorking) {
+		for (int i = 0; i < aDownloaders.size(); i++) {
+			if (!aDownloaders.get(i).bWorking) {
 				iFound = i;
 				break;
 			}
 		}
-		if(iFound != -1) {
+		if (iFound != -1) {
 			aDownloaders.remove(iFound);
 			oMain.oConf.iDLBuffer = aDownloaders.size() * oMain.oConf.iDLBufferMultiplier;
 		}
