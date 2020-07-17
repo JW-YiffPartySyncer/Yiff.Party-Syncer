@@ -31,6 +31,9 @@ import Logic.Workers.WorkerPatreonUpdater;
 import Logic.Workers.WorkerUIUpdater;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 /**
  * 
@@ -107,6 +110,31 @@ public class Main {
 		oThread4.start();
 		
 		chckbxAutoOpen.setSelected(oConf.bUIAutoOpen);
+		
+		JMenuBar menuBar = new JMenuBar();
+		frmYiffpartySyncer.setJMenuBar(menuBar);
+		
+		JMenu mnNewMenu = new JMenu("File");
+		menuBar.add(mnNewMenu);
+		
+		JMenuItem mntmNewMenuItem = new JMenuItem("Close");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		mnNewMenu.add(mntmNewMenuItem);
+		
+		JMenu mnNewMenu_1 = new JMenu("Settings");
+		menuBar.add(mnNewMenu_1);
+		
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Open Settings Editor");
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				openSettingsEditor();
+			}
+		});
+		mnNewMenu_1.add(mntmNewMenuItem_1);
 	}
 
 	/**
@@ -115,7 +143,7 @@ public class Main {
 	private void initialize() {
 		frmYiffpartySyncer = new JFrame();
 		frmYiffpartySyncer.setTitle("Yiff.Party syncer");
-		frmYiffpartySyncer.setBounds(100, 100, 881, 402);
+		frmYiffpartySyncer.setBounds(100, 100, 881, 413);
 		frmYiffpartySyncer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmYiffpartySyncer.getContentPane().setLayout(new MigLayout("", "[][grow]", "[][][][][][][][][][][grow][][][]"));
 
@@ -535,6 +563,13 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	/**
+	 * Launches Settings GUI
+	 */
+	private void openSettingsEditor() {
+		Settings oSettings = new Settings(this);
 	}
 
 }

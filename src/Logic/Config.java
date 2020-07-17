@@ -1,5 +1,13 @@
 package Logic;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 
  * @author JW
@@ -10,7 +18,7 @@ package Logic;
  *
  */
 public class Config {
-	public String strVersion = "0.2.5";
+	public String strVersion = "0.3";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -19,10 +27,10 @@ public class Config {
 
 	// Local save master folder
 	public String strSavepath = "W:\\Private\\yiffparty\\";
-	
+
 	// UI Configuration
 	// Auto-Open default state
-	public boolean bUIAutoOpen = true; 
+	public boolean bUIAutoOpen = true;
 
 	// DownloadManager configuration
 	// How many download workers will be spawned. More download workers = higher
@@ -54,4 +62,150 @@ public class Config {
 	public int iPatreonCheckFailedTimeout = (1000 * 60 * 60 * 1); // 1 hour
 	// Wait time in between consecutive checks
 	public int iPatreonWaitTimeout = (1000 * 60); // 1 second
+
+	public Config() {
+		loadData();
+	}
+
+	/**
+	 * Save all config data to file
+	 */
+	public void saveData() {
+		File oFile = new File("yp.ini");
+		if (oFile.exists()) {
+			oFile.delete();
+		}
+
+		String ls = System.lineSeparator();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("Yiff.Party Syncer v" + strVersion + " config file" + ls);
+		sb.append("[Database]" + ls);
+		sb.append("DBHOST:" + strDBHost + ls);
+		sb.append("DBDATABASE:" + strDBDatabase + ls);
+		sb.append("DBUSER:" + strDBUser + ls);
+		sb.append("DBPW:" + strDBPassword + ls);
+		sb.append("[Master]" + ls);
+		sb.append("SAVEPATH:" + strSavepath + ls);
+		sb.append("[UI]" + ls);
+		sb.append("UIAO:" + (bUIAutoOpen ? "TRUE" : "FALSE") + ls);
+		sb.append("[DLWorkers]" + ls);
+		sb.append("DLW#:" + iNumDLWorkers + ls);
+		sb.append("DLB:" + iDLBuffer + ls);
+		sb.append("DLBM:" + iDLBufferMultiplier + ls);
+		sb.append("DLFT:" + iDLWFailTimeout + ls);
+		sb.append("DLRT:" + iDLWRetryTimeout + ls);
+		sb.append("CONVERTPNG:" + (bDLWConvertPNGs ? "TRUE" : "FALSE") + ls);
+		sb.append("CVQUAL:" + fDLWJPGQuality + ls);
+		sb.append("[PatreonWorkers]" + ls);
+		sb.append("PCHKT:" + iPatreonCheckTimeout + ls);
+		sb.append("PCHKFT:" + iPatreonCheckFailedTimeout + ls);
+		sb.append("PWT:" + iPatreonWaitTimeout + ls);
+		sb.append("//eof");
+
+		try {
+			FileWriter fw = new FileWriter(oFile);
+			fw.write(sb.toString());
+			fw.flush();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * If file yp.ini exists in workingdir, try to load and parse it.
+	 */
+	public void loadData() {
+		File oFile = new File("yp.ini");
+		if (oFile.exists()) {
+			String[] aData = null;
+			try {
+				FileReader fileReader = new FileReader(oFile);
+				BufferedReader bufferedReader = new BufferedReader(fileReader);
+				List<String> lines = new ArrayList<String>();
+				String line = null;
+				while ((line = bufferedReader.readLine()) != null) {
+					lines.add(line);
+				}
+				bufferedReader.close();
+				aData = lines.toArray(new String[lines.size()]);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (aData != null) {
+				for (String strLine : aData) {
+					parseLine(strLine);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Parse a single line of the config file
+	 * 
+	 * @param strLine - A single line in the config file
+	 */
+	private void parseLine(String strLine) {
+		if (strLine.contains(":")) {
+			String strKey = strLine.substring(0, strLine.indexOf(':'));
+			String strValue = strLine.substring(strLine.indexOf(':') + 1);
+			try {
+				switch (strKey) {
+				case "DBHOST":
+					strDBHost = strValue;
+					break;
+				case "DBDATABASE":
+					strDBDatabase = strValue;
+					break;
+				case "DBUSER":
+					strDBUser = strValue;
+					break;
+				case "DBPW":
+					strDBPassword = strValue;
+					break;
+				case "SAVEPATH":
+					strSavepath = strValue;
+					break;
+				case "UIAO":
+					bUIAutoOpen = strValue.equals("TRUE");
+					break;
+				case "DLW#":
+					iNumDLWorkers = Integer.parseInt(strValue);
+					break;
+				case "DLB":
+					iDLBuffer = Integer.parseInt(strValue);
+					break;
+				case "DLBM":
+					iDLBufferMultiplier = Integer.parseInt(strValue);
+					break;
+				case "DLFT":
+					iDLWFailTimeout = Integer.parseInt(strValue);
+					break;
+				case "DLRT":
+					iDLWRetryTimeout = Integer.parseInt(strValue);
+					break;
+				case "CONVERTPNG":
+					bDLWConvertPNGs = strValue.equals("TRUE");
+					break;
+				case "CVQUAL":
+					fDLWJPGQuality = Float.parseFloat(strValue);
+					break;
+				case "PCHKT":
+					iPatreonCheckTimeout = Integer.parseInt(strValue);
+					break;
+				case "PCHKFT":
+					iPatreonCheckFailedTimeout = Integer.parseInt(strValue);
+					break;
+				case "PWT":
+					iPatreonWaitTimeout = Integer.parseInt(strValue);
+					break;
+				default:
+					break;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
