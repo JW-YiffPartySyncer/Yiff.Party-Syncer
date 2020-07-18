@@ -117,11 +117,11 @@ public class Settings extends JFrame {
 		textFieldSavepath.setColumns(10);
 		contentPane.add(btnNewButton, "cell 1 11,alignx right");
 		contentPane.add(chckbxConvertPNG, "cell 1 6");
-		
+
 		JLabel lblNewLabel_9 = new JLabel("| JPG Quality:");
 		contentPane.add(lblNewLabel_9, "cell 1 6");
-		
-		spinnerJPGQ.setModel(new SpinnerNumberModel(new Float(0), new Float(0), new Float(100), new Float(1)));
+
+		spinnerJPGQ.setModel(new SpinnerNumberModel(0, 0, 100, 1));
 		contentPane.add(spinnerJPGQ, "cell 1 6");
 
 		textFieldDBHostname.setText(oMain.oConf.strDBHost);
@@ -131,7 +131,9 @@ public class Settings extends JFrame {
 
 		spinnerDLThreads.setValue(oMain.oConf.iNumDLWorkers);
 		chckbxConvertPNG.setSelected(oMain.oConf.bDLWConvertPNGs);
-		spinnerJPGQ.setValue((int) (oMain.oConf.fDLWJPGQuality * 100.0));
+		spinnerJPGQ.setValue(oMain.oConf.fDLWJPGQuality > 0.99f ? 100
+				: Integer.parseInt(Float.toString(oMain.oConf.fDLWJPGQuality).length() == 3 ? Float.toString(oMain.oConf.fDLWJPGQuality).substring(2).concat("0")
+						: Float.toString(oMain.oConf.fDLWJPGQuality).substring(2)));
 
 		chckbxAutoOpen.setSelected(oMain.oConf.bUIAutoOpen);
 
@@ -151,7 +153,7 @@ public class Settings extends JFrame {
 
 		oMain.oConf.iNumDLWorkers = (int) spinnerDLThreads.getValue();
 		oMain.oConf.bDLWConvertPNGs = chckbxConvertPNG.isSelected();
-		oMain.oConf.fDLWJPGQuality = ((float) spinnerJPGQ.getValue()) / 100.0f;
+		oMain.oConf.fDLWJPGQuality = Float.parseFloat((int) spinnerJPGQ.getValue() == 100 ? "1.0" : ("0." + spinnerJPGQ.getValue()));
 
 		oMain.oConf.bUIAutoOpen = chckbxAutoOpen.isSelected();
 
