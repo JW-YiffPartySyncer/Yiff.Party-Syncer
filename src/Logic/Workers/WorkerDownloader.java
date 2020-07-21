@@ -131,6 +131,7 @@ public class WorkerDownloader implements Runnable {
 							File oDest = new File(DO.strPath + (bConverted ? ".jpg" : ""));
 							try {
 								System.out.println("Copy from " + oFile.getAbsolutePath() + " to " + oDest.getAbsolutePath());
+								oDest.getParentFile().mkdirs();
 								Files.copy(Paths.get(oFile.getPath()), Paths.get(oDest.getPath()), StandardCopyOption.REPLACE_EXISTING);
 								updatePost(DO, true, false);
 								System.out.println("WorkerDownloader: finished " + DO.ID);
