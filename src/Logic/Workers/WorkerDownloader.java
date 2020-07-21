@@ -183,10 +183,10 @@ public class WorkerDownloader implements Runnable {
 	 * @return Boolean whether file has successfully been converted.
 	 */
 	private boolean convert(String strPath) {
+		File input = new File(strPath);
+		File output = new File(strPath + ".jpg");
 		try {
 			System.out.println("Starting conversion on " + strPath);
-			File input = new File(strPath);
-			File output = new File(strPath + ".jpg");
 			output.createNewFile();
 
 			BufferedImage image = ImageIO.read(input);
@@ -212,6 +212,7 @@ public class WorkerDownloader implements Runnable {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			output.delete();
 			return false;
 		}
 	}

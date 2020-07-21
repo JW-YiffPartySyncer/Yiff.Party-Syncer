@@ -45,6 +45,7 @@ public class Category extends JFrame {
 	private JTextField textFieldSubfolder;
 	private JComboBox<String> comboBoxPatreons = new JComboBox<String>();
 	private JComboBox<String> comboBoxPatreonCategory = new JComboBox<String>();
+	private JLabel lblStatusRelocate = new JLabel("");
 
 	private ArrayList<Integer> aComboboxCategoriesIDs = new ArrayList<Integer>();
 	private ArrayList<Integer> aComboboxPatreonsIDs = new ArrayList<Integer>();
@@ -147,10 +148,15 @@ public class Category extends JFrame {
 		JButton btnNewButton_6 = new JButton("Recategorize&Move");
 		btnNewButton_6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				recatAndMove();
+				recategorizeAndMove();
 			}
 		});
-		contentPane.add(btnNewButton_6, "cell 1 7");
+		contentPane.add(btnNewButton_6, "flowx,cell 1 7");
+
+		JLabel lblNewLabel_5 = new JLabel("Relocate status:");
+		contentPane.add(lblNewLabel_5, "cell 1 7");
+
+		contentPane.add(lblStatusRelocate, "cell 1 7");
 
 		connection = OUtil.connectToMysql(oMain.oConf.strDBHost, oMain.oConf.strDBDatabase, oMain.oConf.strDBUser, oMain.oConf.strDBPassword);
 		try {
@@ -246,8 +252,8 @@ public class Category extends JFrame {
 	}
 
 	/**
-	 * Edit name or path of the currently selected category
-	 * TODO: On Edit, move ALL Files!
+	 * Edit name or path of the currently selected category TODO: On Edit, move ALL
+	 * Files!
 	 */
 	private void edit() {
 		try {
@@ -266,7 +272,7 @@ public class Category extends JFrame {
 		aComboboxPatreonsIDs.clear();
 		try {
 			resultSet = statement.executeQuery("SELECT * FROM patreons WHERE category = " + aComboboxCategoriesIDs.get(comboBoxCategories.getSelectedIndex())
-					+ (comboBoxCategories.getSelectedIndex() == 0 ? " OR category = 0 " : "") + " AND name != '' ORDER BY name ASC");
+					+ (comboBoxCategories.getSelectedIndex() == 0 ? " OR category = 0 " : "") + " AND name != '' AND wanted = 1 ORDER BY name ASC");
 			if (resultSet != null) {
 				while (resultSet.next()) {
 					comboBoxPatreons.addItem(resultSet.getString("name"));
@@ -325,9 +331,10 @@ public class Category extends JFrame {
 	 * Change Category of selected Patreon. Move it at the end and reload all
 	 * Information
 	 */
-	private void recatAndMove() {
+	private void recategorizeAndMove() {
 		String strOldCatPath = comboBoxCategories.getItemAt(comboBoxCategories.getSelectedIndex());
 		String strNewCatPath = comboBoxPatreonCategory.getItemAt(comboBoxPatreonCategory.getSelectedIndex());
+		lblStatusRelocate.setText("");
 		try {
 			resultSet = statement.executeQuery("SELECT * FROM patreons WHERE ID = " + aComboboxPatreonsIDs.get(comboBoxPatreons.getSelectedIndex()));
 			if (resultSet != null && resultSet.next()) {
@@ -340,6 +347,8 @@ public class Category extends JFrame {
 						bSuccess = true;
 					} catch (Exception e) {
 						e.printStackTrace();
+						lblStatusRelocate.setText(oDest.getName() + " failed");
+						bSuccess = false;
 					}
 				} else {
 					bSuccess = false;
@@ -352,7 +361,9 @@ public class Category extends JFrame {
 						oMain.invalidatePatreonID(aComboboxPatreonsIDs.get(comboBoxPatreons.getSelectedIndex()));
 						oOldPath.delete();
 						loadPatreons();
+						lblStatusRelocate.setText(oDest.getName() + " successfull");
 					} catch (SQLException e) {
+						lblStatusRelocate.setText(oDest.getName() + " failed");
 						e.printStackTrace();
 					}
 				}
