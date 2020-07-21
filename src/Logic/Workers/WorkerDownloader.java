@@ -24,6 +24,7 @@ import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 
 import Logic.DownloadObject;
 import Logic.OUtil;
@@ -199,9 +200,11 @@ public class WorkerDownloader implements Runnable {
 			ImageWriteParam iwp = writer.getDefaultWriteParam();
 			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 			iwp.setCompressionQuality(oMain.oConf.fDLWJPGQuality);
-			writer.setOutput(ImageIO.createImageOutputStream(output));
+			ImageOutputStream ios = ImageIO.createImageOutputStream( output );
+			writer.setOutput(ios);
 			writer.write(null, new IIOImage(result, null, null), iwp);
 			writer.dispose();
+			ios.close();
 			result.flush();
 
 			input.delete();
