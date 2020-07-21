@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import Logic.OUtil;
+import Logic.Workers.WorkerRelocater;
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -267,7 +268,7 @@ public class Category extends JFrame {
 	/**
 	 * Tries to load all Patreons in the selected category
 	 */
-	private void loadPatreons() {
+	public void loadPatreons() {
 		comboBoxPatreons.removeAllItems();
 		aComboboxPatreonsIDs.clear();
 		try {
@@ -328,8 +329,8 @@ public class Category extends JFrame {
 	}
 
 	/**
-	 * Change Category of selected Patreon. Move it at the end and reload all
-	 * Information
+	 * Try to spawn a Relocation Worker to move a patreon to the new category and
+	 * folder
 	 */
 	private void recategorizeAndMove() {
 		String strOldCatPath = comboBoxCategories.getItemAt(comboBoxCategories.getSelectedIndex());
@@ -338,35 +339,12 @@ public class Category extends JFrame {
 		try {
 			resultSet = statement.executeQuery("SELECT * FROM patreons WHERE ID = " + aComboboxPatreonsIDs.get(comboBoxPatreons.getSelectedIndex()));
 			if (resultSet != null && resultSet.next()) {
-				File oOldPath = new File(oMain.oConf.strSavepath + strOldCatPath + "\\" + resultSet.getString("name"));
-				File oDest = new File(oMain.oConf.strSavepath + strNewCatPath + "\\" + resultSet.getString("name"));
-				boolean bSuccess = false;
-				if (oOldPath.exists()) {
-					try {
-						OUtil.move(oOldPath, oDest);
-						bSuccess = true;
-					} catch (Exception e) {
-						e.printStackTrace();
-						lblStatusRelocate.setText(oDest.getName() + " failed");
-						bSuccess = false;
-					}
-				} else {
-					bSuccess = false;
-				}
-
-				if (bSuccess) {
-					try {
-						statement.executeUpdate("UPDATE patreons SET category = " + aComboboxCategoriesIDs.get(comboBoxPatreonCategory.getSelectedIndex()) + " WHERE ID = "
-								+ aComboboxPatreonsIDs.get(comboBoxPatreons.getSelectedIndex()));
-						oMain.invalidatePatreonID(aComboboxPatreonsIDs.get(comboBoxPatreons.getSelectedIndex()));
-						oOldPath.delete();
-						loadPatreons();
-						lblStatusRelocate.setText(oDest.getName() + " successfull");
-					} catch (SQLException e) {
-						lblStatusRelocate.setText(oDest.getName() + " failed");
-						e.printStackTrace();
-					}
-				}
+				WorkerRelocater oW = new WorkerRelocater(oMain.oConf.strSavepath + strOldCatPath + "\\" + resultSet.getString("name"),
+						oMain.oConf.strSavepath + strNewCatPath + "\\" + resultSet.getString("name"), aComboboxCategoriesIDs.get(comboBoxPatreonCategory.getSelectedIndex()),
+						aComboboxPatreonsIDs.get(comboBoxPatreons.getSelectedIndex()), lblStatusRelocate, oMain, this, 1);
+				Thread oThread = new Thread(oW);
+				oThread.setName("WorkerRelocater " + resultSet.getString("name"));
+				oThread.start();
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
