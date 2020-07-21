@@ -12,7 +12,10 @@ public class DownloadObject {
 	public String strPath;
 	public String strURL;
 	public int ID;
+	public int iPatreonID;
+	public String strName;
 
+	public boolean invalid = false;
 	public boolean finished;
 	public boolean touched;
 }

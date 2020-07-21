@@ -1,33 +1,20 @@
--- phpMyAdmin SQL Dump
--- version 5.0.2
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Erstellungszeit: 11. Jul 2020 um 15:07
--- Server-Version: 10.4.11-MariaDB
--- PHP-Version: 7.4.6
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- Datenbank: `yiffparty`
---
 CREATE DATABASE IF NOT EXISTS `yiffparty` DEFAULT CHARACTER SET utf32 COLLATE utf32_general_ci;
 USE `yiffparty`;
 
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `patreons`
---
+CREATE TABLE `categories` (
+  `ID` int(11) NOT NULL,
+  `Name` tinytext NOT NULL,
+  `Path` tinytext NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 
 CREATE TABLE `patreons` (
   `ID` int(11) NOT NULL,
@@ -35,14 +22,9 @@ CREATE TABLE `patreons` (
   `name` text NOT NULL DEFAULT '',
   `last_checked` bigint(20) NOT NULL DEFAULT 0,
   `success` tinyint(1) NOT NULL DEFAULT 0,
-  `wanted` tinyint(4) DEFAULT 0
+  `wanted` tinyint(4) DEFAULT 0,
+  `category` int(11) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `posts`
---
 
 CREATE TABLE `posts` (
   `ID` int(11) NOT NULL,
@@ -55,12 +37,6 @@ CREATE TABLE `posts` (
   `last_checked` bigint(20) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `webrip`
---
-
 CREATE TABLE `webrip` (
   `ID` int(11) NOT NULL,
   `Timestamp` int(11) NOT NULL,
@@ -68,52 +44,36 @@ CREATE TABLE `webrip` (
   `data` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 
---
--- Indizes der exportierten Tabellen
---
 
---
--- Indizes für die Tabelle `patreons`
---
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`ID`);
+
 ALTER TABLE `patreons`
   ADD PRIMARY KEY (`ID`);
 
---
--- Indizes für die Tabelle `posts`
---
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`ID`),
   ADD KEY `HASH` (`href`(768)) USING HASH,
   ADD KEY `downloaded_ID_lastChecked` (`downloaded`,`ID`,`last_checked`);
 
---
--- Indizes für die Tabelle `webrip`
---
 ALTER TABLE `webrip`
   ADD PRIMARY KEY (`ID`);
 
---
--- AUTO_INCREMENT für exportierte Tabellen
---
 
---
--- AUTO_INCREMENT für Tabelle `patreons`
---
+ALTER TABLE `categories`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `patreons`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT für Tabelle `posts`
---
 ALTER TABLE `posts`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT für Tabelle `webrip`
---
 ALTER TABLE `webrip`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
+
+INSERT INTO `categories` (`name`, `path`) VALUES ("Uncategorized", "Uncategorized\\"); 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

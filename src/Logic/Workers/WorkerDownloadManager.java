@@ -1,7 +1,7 @@
 package Logic.Workers;
 
+import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -32,6 +32,7 @@ public class WorkerDownloadManager implements Runnable {
 
 	private Main oMain;
 	public int iWorkerIndex = -1; // Last running worker in the aDownloaders ArrayList
+	private boolean bArrayAccess = false;
 
 	public WorkerDownloadManager(Main oMain) {
 		this.oMain = oMain;
@@ -47,6 +48,11 @@ public class WorkerDownloadManager implements Runnable {
 			statement = connection.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+
+		File oFile = new File(oMain.oConf.strSavepath + "Temp\\");
+		if (!oFile.exists()) {
+			oFile.mkdirs();
 		}
 
 		// Spawn initial number of download threads
@@ -68,7 +74,7 @@ public class WorkerDownloadManager implements Runnable {
 			}
 			checkWorkers();
 			try {
-				Thread.sleep(5);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -79,15 +85,17 @@ public class WorkerDownloadManager implements Runnable {
 	 * if we finished a DownloadObject, remove it from the DO ArrayList
 	 */
 	private void checkQueue() {
-		ArrayList<DownloadObject> aTemp = new ArrayList<DownloadObject>();
-		for (DownloadObject DO : aDOs) {
-			if (DO.finished) {
-				aTemp.add(DO);
-				System.out.println("WorkerDownloadManager: removed " + DO.ID + " from Queue");
+		if (!bArrayAccess) {
+			ArrayList<DownloadObject> aTemp = new ArrayList<DownloadObject>();
+			for (DownloadObject DO : aDOs) {
+				if (DO.finished || DO.invalid) {
+					aTemp.add(DO);
+					System.out.println("WorkerDownloadManager: removed " + DO.ID + " from Queue");
+				}
 			}
-		}
 
-		aDOs.removeAll(aTemp);
+			aDOs.removeAll(aTemp);
+		}
 	}
 
 	/**
@@ -120,6 +128,7 @@ public class WorkerDownloadManager implements Runnable {
 						DO.ID = resultSet.getInt("ID");
 						DO.strURL = resultSet.getString("href");
 						strName = resultSet.getString("name");
+						DO.strName = strName;
 						patreon = resultSet.getInt("patreon");
 						strTimestamp = resultSet.getString("date");
 					} catch (SQLException e) {
@@ -136,12 +145,22 @@ public class WorkerDownloadManager implements Runnable {
 							try {
 								if (resultSet.next()) {
 									String strRoot = resultSet.getString("name");
-									if (strRoot != null) {
-										DO.strPath = oMain.oConf.strSavepath + strRoot + "\\" + strTimestamp + strName.substring(0, strName.lastIndexOf('.')) + DO.ID
-												+ strName.substring(strName.lastIndexOf('.'));
-										aDOs.add(DO);
-										aQueue.put(DO);
-										return true;
+									ResultSet resultSet2 = statement.executeQuery(
+											"SELECT * FROM categories WHERE ID = " + (resultSet.getInt("category") == 0 ? " 1 OR ID = 0" : resultSet.getInt("category")));
+									if (resultSet2 != null) {
+										if (resultSet2.next()) {
+											if (strRoot != null) {
+												DO.strPath = oMain.oConf.strSavepath  + resultSet2.getString("path") + strRoot + "\\"+ strTimestamp
+														+ strName.substring(0, strName.lastIndexOf('.')) + DO.ID + strName.substring(strName.lastIndexOf('.'));
+												aDOs.add(DO);
+												aQueue.put(DO);
+												return true;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
 									}
 								} else {
 									return false;
@@ -205,6 +224,27 @@ public class WorkerDownloadManager implements Runnable {
 			aDownloaders.remove(iFound);
 			oMain.oConf.iDLBuffer = aDownloaders.size() * oMain.oConf.iDLBufferMultiplier;
 		}
+	}
+
+	/**
+	 * Go through all DownloadObjects and invalidate DownloadObjects that match the
+	 * given PatreonID
+	 * 
+	 * @param iPatreonID - Patreon ID that will get all buffered objects invalidated
+	 */
+	public void invalidate(int iPatreonID) {
+		bArrayAccess = true;
+		try {
+			for (DownloadObject o : aDOs) {
+				if (o.iPatreonID == iPatreonID) {
+					o.invalid = true;
+				}
+			}
+		} catch (Exception e) {
+			bArrayAccess = false;
+			e.printStackTrace();
+		}
+		bArrayAccess = false;
 	}
 
 }

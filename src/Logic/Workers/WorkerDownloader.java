@@ -11,6 +11,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -69,7 +72,9 @@ public class WorkerDownloader implements Runnable {
 			e.printStackTrace();
 		}
 		bRunning = true;
+		boolean bConverted = false;
 		while (bRunning) {
+			bConverted = false;
 			DownloadObject DO = null;
 			strStatus = "Idle";
 			lTimestamp = System.currentTimeMillis();
@@ -87,9 +92,8 @@ public class WorkerDownloader implements Runnable {
 				System.out.println("WorkerDownloader: starting on " + DO.ID + " | " + DO.strURL);
 				DO.touched = true;
 				URL website;
-				File oFile = new File(DO.strPath);
-				// If destination folder doesnt exist, create it.
-				oFile.getParentFile().mkdirs();
+				// File oFile = new File(DO.strPath);
+				File oFile = new File(oMain.oConf.strSavepath + "Temp\\" + DO.strName);
 				if (oFile.exists()) {
 					oFile.delete();
 				}
@@ -101,7 +105,7 @@ public class WorkerDownloader implements Runnable {
 					conn.setReadTimeout(1000 * 30);
 					conn.setConnectTimeout(1000 * 15);
 					ReadableByteChannel rbc = Channels.newChannel(conn.getInputStream());
-					FileOutputStream fos = new FileOutputStream(DO.strPath);
+					FileOutputStream fos = new FileOutputStream(oFile);
 					fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 					fos.close();
 					// If the downloaded filesize doesn't match the reported filesize from the
@@ -111,17 +115,29 @@ public class WorkerDownloader implements Runnable {
 							success = false;
 						}
 					}
-					if (success) {
+					if (success && !DO.invalid) {
 						// If the downloaded file is a PNG, convert it to high quality JPG. Cause PNGs
 						// are *big*
 						if (oMain.oConf.bDLWConvertPNGs) {
-							if (DO.strPath.substring(DO.strPath.lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
-								success = convert(DO.strPath);
+							if (DO.strName.substring(DO.strName.lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
+								success = convert(oFile.getAbsolutePath());
+								if (success) {
+									oFile = new File(oFile.getAbsolutePath() + ".jpg");
+									bConverted = true;
+								}
 							}
 						}
-						if (success) {
-							updatePost(DO, true, false);
-							System.out.println("WorkerDownloader: finished " + DO.ID);
+						if (success && !DO.invalid) {
+							File oDest = new File(DO.strPath + (bConverted ? ".jpg" : ""));
+							try {
+								System.out.println("Copy from " + oFile.getAbsolutePath() + " to " + oDest.getAbsolutePath());
+								Files.copy(Paths.get(oFile.getPath()), Paths.get(oDest.getPath()), StandardCopyOption.REPLACE_EXISTING);
+								updatePost(DO, true, false);
+								System.out.println("WorkerDownloader: finished " + DO.ID);
+							} catch (IOException ioe) {
+								success = false;
+								ioe.printStackTrace();
+							}
 						}
 					}
 				} catch (FileNotFoundException fnfe) {
@@ -149,6 +165,7 @@ public class WorkerDownloader implements Runnable {
 				strStatus = "Finished";
 				lTimestamp = System.currentTimeMillis();
 				DO.finished = true;
+				oFile.delete();
 			}
 		}
 		bWorking = false;

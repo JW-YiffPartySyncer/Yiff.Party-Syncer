@@ -108,15 +108,15 @@ public class Main {
 		Thread oThread4 = new Thread(oW4);
 		oThread4.setName("WorkerUIUpdater");
 		oThread4.start();
-		
+
 		chckbxAutoOpen.setSelected(oConf.bUIAutoOpen);
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		frmYiffpartySyncer.setJMenuBar(menuBar);
-		
+
 		JMenu mnNewMenu = new JMenu("File");
 		menuBar.add(mnNewMenu);
-		
+
 		JMenuItem mntmNewMenuItem = new JMenuItem("Close");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -124,10 +124,10 @@ public class Main {
 			}
 		});
 		mnNewMenu.add(mntmNewMenuItem);
-		
+
 		JMenu mnNewMenu_1 = new JMenu("Settings");
 		menuBar.add(mnNewMenu_1);
-		
+
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Open Settings Editor");
 		mntmNewMenuItem_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -135,6 +135,14 @@ public class Main {
 			}
 		});
 		mnNewMenu_1.add(mntmNewMenuItem_1);
+
+		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Manage Categories");
+		mntmNewMenuItem_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				openCategoryGUI();
+			}
+		});
+		mnNewMenu_1.add(mntmNewMenuItem_2);
 	}
 
 	/**
@@ -242,7 +250,7 @@ public class Main {
 
 		JLabel lblNewLabel_6 = new JLabel("DL Threads:");
 		frmYiffpartySyncer.getContentPane().add(lblNewLabel_6, "flowx,cell 0 9");
-		
+
 		lblDLThreads.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		frmYiffpartySyncer.getContentPane().add(lblDLThreads, "cell 1 9");
 
@@ -283,7 +291,7 @@ public class Main {
 		});
 		frmYiffpartySyncer.getContentPane().add(btnNewButton_3, "cell 1 2");
 
-		connection = OUtil.connectToMysql("localhost", "yiffparty", "client", "keins");
+		connection = OUtil.connectToMysql(oConf.strDBHost, oConf.strDBDatabase, oConf.strDBUser, oConf.strDBPassword);
 		if (connection != null) {
 			try {
 				statement = connection.createStatement();
@@ -554,22 +562,29 @@ public class Main {
 	 * loaded patreon in the default browser
 	 */
 	private void open() {
-		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE) && !textFieldLink.getText().equals("")) {
-			try {
-				Desktop.getDesktop().browse(new URI(textFieldLink.getText()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-		}
+		OUtil.openInBrowser(textFieldLink.getText());
 	}
-	
+
+	/**
+	 * Opens the Category GUI
+	 */
+	private void openCategoryGUI() {
+		Category oC = new Category(this);
+	}
+
 	/**
 	 * Launches Settings GUI
 	 */
 	private void openSettingsEditor() {
 		Settings oSettings = new Settings(this);
+	}
+
+	/**
+	 * Tries to invalidate all running and buffered DownloadObjects that are
+	 * designated to the given patreon
+	 */
+	public void invalidatePatreonID(int iID) {
+		oDownloadManager.invalidate(iID);
 	}
 
 }
