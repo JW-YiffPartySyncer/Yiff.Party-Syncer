@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 public class Config {
-	public String strVersion = "0.4.1";
+	public String strVersion = "0.4.2";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";

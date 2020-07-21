@@ -345,7 +345,7 @@ public class Main {
 		if (iCurrentLink != 0) {
 			try {
 				statement.executeUpdate(
-						"UPDATE patreons SET wanted = " + i + " AND category = " + aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex()) + " WHERE ID = " + iCurrentLink);
+						"UPDATE patreons SET wanted = " + i + ", category = " + aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex()) + " WHERE ID = " + iCurrentLink);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -389,7 +389,7 @@ public class Main {
 								statement.executeUpdate("INSERT INTO patreons (link, wanted, category) VALUES ('" + strLink + "', 1, "
 										+ aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex()) + ")");
 							} else {
-								statement.executeUpdate("UPDATE patreons SET wanted = 1 AND category = " + aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex())
+								statement.executeUpdate("UPDATE patreons SET wanted = 1, category = " + aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex())
 										+ " WHERE link = '" + strLink + "'");
 							}
 						}
