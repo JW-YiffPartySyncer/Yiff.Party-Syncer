@@ -1,25 +1,28 @@
 package UI;
 
-import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -30,10 +33,6 @@ import Logic.Workers.WorkerDownloadManager;
 import Logic.Workers.WorkerPatreonUpdater;
 import Logic.Workers.WorkerUIUpdater;
 import net.miginfocom.swing.MigLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 /**
  * 
@@ -68,6 +67,9 @@ public class Main {
 	private DefaultListModel<String> listActivityModel = new DefaultListModel<>();
 	private JList<String> listDownloaders = new JList<String>(listActivityModel);
 
+	private JComboBox<String> comboBoxCategory = new JComboBox<String>();
+	private ArrayList<Integer> aComboCategoryIDs = new ArrayList<Integer>();
+
 	/**
 	 * Launch the application.
 	 */
@@ -89,6 +91,7 @@ public class Main {
 	 */
 	public Main() {
 		initialize();
+		reloadCategories();
 		updatePatreonTracking();
 
 		WorkerCreatorParser oW = new WorkerCreatorParser(this);
@@ -110,6 +113,11 @@ public class Main {
 		oThread4.start();
 
 		chckbxAutoOpen.setSelected(oConf.bUIAutoOpen);
+
+		JLabel lblNewLabel_7 = new JLabel("| Category:");
+		frmYiffpartySyncer.getContentPane().add(lblNewLabel_7, "cell 1 1");
+
+		frmYiffpartySyncer.getContentPane().add(comboBoxCategory, "cell 1 1");
 
 		JMenuBar menuBar = new JMenuBar();
 		frmYiffpartySyncer.setJMenuBar(menuBar);
@@ -336,7 +344,8 @@ public class Main {
 	private void update(int i) {
 		if (iCurrentLink != 0) {
 			try {
-				statement.executeUpdate("UPDATE patreons SET wanted = " + i + " WHERE ID = " + iCurrentLink);
+				statement.executeUpdate(
+						"UPDATE patreons SET wanted = " + i + " AND category = " + aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex()) + " WHERE ID = " + iCurrentLink);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -377,9 +386,11 @@ public class Main {
 					try {
 						if (resultSet.next()) {
 							if (resultSet.getInt(1) == 0) {
-								statement.executeUpdate("INSERT INTO patreons (link, wanted) VALUES ('" + strLink + "', 1)");
+								statement.executeUpdate("INSERT INTO patreons (link, wanted, category) VALUES ('" + strLink + "', 1, "
+										+ aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex()) + ")");
 							} else {
-								statement.executeUpdate("UPDATE patreons SET wanted = 1 WHERE link = '" + strLink + "'");
+								statement.executeUpdate("UPDATE patreons SET wanted = 1 AND category = " + aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex())
+										+ " WHERE link = '" + strLink + "'");
 							}
 						}
 					} catch (SQLException e) {
@@ -585,6 +596,27 @@ public class Main {
 	 */
 	public void invalidatePatreonID(int iID) {
 		oDownloadManager.invalidate(iID);
+	}
+
+	/**
+	 * Reloads categories from DB. Public because gets called from Category UI
+	 */
+	public void reloadCategories() {
+		comboBoxCategory.removeAllItems();
+		aComboCategoryIDs.clear();
+		try {
+			resultSet = statement.executeQuery("SELECT * FROM categories");
+			if (resultSet != null) {
+				if (resultSet.next()) {
+					do {
+						comboBoxCategory.addItem(resultSet.getString("name"));
+						aComboCategoryIDs.add(resultSet.getInt("ID"));
+					} while (resultSet.next());
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

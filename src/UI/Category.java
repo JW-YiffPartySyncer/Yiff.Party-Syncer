@@ -242,10 +242,12 @@ public class Category extends JFrame {
 			}
 		}
 		initialize();
+		oMain.reloadCategories();
 	}
 
 	/**
 	 * Edit name or path of the currently selected category
+	 * TODO: On Edit, move ALL Files!
 	 */
 	private void edit() {
 		try {
