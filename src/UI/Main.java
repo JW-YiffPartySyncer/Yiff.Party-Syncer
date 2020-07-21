@@ -344,8 +344,8 @@ public class Main {
 	private void update(int i) {
 		if (iCurrentLink != 0) {
 			try {
-				statement.executeUpdate(
-						"UPDATE patreons SET wanted = " + i + ", category = " + aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex()) + " WHERE ID = " + iCurrentLink);
+				statement.executeUpdate("UPDATE patreons SET wanted = " + i + ", category = " + (i == 1 ? aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex()) : 1)
+						+ " WHERE ID = " + iCurrentLink);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
