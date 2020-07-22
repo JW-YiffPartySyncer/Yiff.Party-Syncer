@@ -91,22 +91,37 @@ public class OUtil {
 			if (newFile.exists() && !newFile.isDirectory() && zipEntry.isDirectory()) {
 				newFile.delete();
 			}
+			boolean bFound = false;
 			if (!newFile.exists()) {
 				newFile.getParentFile().mkdirs();
 				if (zipEntry.isDirectory()) {
 					newFile.mkdir();
 				} else {
-					FileOutputStream fos = new FileOutputStream(newFile);
-					int len;
-					while ((len = zis.read(buffer)) > 0) {
-						fos.write(buffer, 0, len);
+					if (newFile.getName().contains(".")) {
+						if (newFile.getName().substring(newFile.getName().lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
+							File toCheck = new File(newFile.getParentFile().getAbsolutePath(), newFile.getName() + ".jpg");
+							if (toCheck.exists()) {
+								bFound = true;
+							}
+						}
 					}
-					fos.close();
+					if (!bFound) {
+						FileOutputStream fos = new FileOutputStream(newFile);
+						int len;
+						while ((len = zis.read(buffer)) > 0) {
+							fos.write(buffer, 0, len);
+						}
+						fos.close();
+					}
 				}
 			}
-			if (newFile.getName().contains(".")) {
+			if (newFile.getName().contains(".") && !bFound) {
 				if (newFile.getName().substring(newFile.getName().lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
-					convertWorker.convert(newFile.getAbsolutePath());
+					try {
+						convertWorker.convert(newFile.getAbsolutePath());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			zipEntry = zis.getNextEntry();
