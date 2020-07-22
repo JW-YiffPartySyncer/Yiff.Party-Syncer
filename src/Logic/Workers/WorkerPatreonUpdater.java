@@ -276,6 +276,7 @@ public class WorkerPatreonUpdater implements Runnable {
 						} while (attachment != null);
 					}
 				}
+				scanForMEGALinks(card.toString(), "MEGA.NZ", strID, strTitle, strTimestamp);
 			} else {
 				bSuccess = false;
 				System.out.println("Error?");
@@ -426,6 +427,17 @@ public class WorkerPatreonUpdater implements Runnable {
 			}
 		}
 		return strResult;
+	}
+
+	private void scanForMEGALinks(String strData, String strName, String strID, String strTitle, String strTimestamp) {
+		String[] aData = prettify(strData);
+		for (String strLine : aData) {
+			if (strLine.contains("mega.nz/")) {
+				String strLink = strLine.substring(strLine.indexOf('"') + 1, strLine.indexOf('"', strLine.indexOf('"') + 1));
+				updatePosts(strName, strLink, strID, strTitle, strTimestamp);
+			}
+		}
+		return;
 	}
 
 }

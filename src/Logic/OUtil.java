@@ -2,6 +2,8 @@ package Logic;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,6 +12,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * 
@@ -54,28 +58,71 @@ public class OUtil {
 			}
 		}
 	}
-	
-	public static boolean move(File sourceFile, File destFile)
-	{
-	    if (sourceFile.isDirectory())
-	    {
-	        for (File file : sourceFile.listFiles())
-	        {
-	            move(file, new File(destFile.getAbsolutePath() + "\\" + file.getName()));
-	        }
-	    }
-	    else
-	    {
-	        try {
-	        	System.out.println("move file " + sourceFile.getAbsolutePath() + " to " + destFile.getAbsolutePath());
-	        	destFile.getParentFile().mkdirs();
-	            Files.move(Paths.get(sourceFile.getPath()), Paths.get(destFile.getPath()), StandardCopyOption.REPLACE_EXISTING);
-	            return true;
-	        } catch (IOException e) {
-	        	e.printStackTrace();
-	            return false;
-	        }
-	    }
-	    return false;
+
+	public static boolean move(File sourceFile, File destFile) {
+		if (sourceFile.isDirectory()) {
+			for (File file : sourceFile.listFiles()) {
+				move(file, new File(destFile.getAbsolutePath() + "\\" + file.getName()));
+			}
+		} else {
+			try {
+				System.out.println("move file " + sourceFile.getAbsolutePath() + " to " + destFile.getAbsolutePath());
+				destFile.getParentFile().mkdirs();
+				Files.move(Paths.get(sourceFile.getPath()), Paths.get(destFile.getPath()), StandardCopyOption.REPLACE_EXISTING);
+				return true;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return false;
+	}
+
+	public static void unzipSameDir(File oFile) throws IOException, IllegalArgumentException {
+		File destDir = new File(
+				oFile.getParentFile().getAbsolutePath() + "\\" + oFile.getName().substring(isNumeric(oFile.getName().substring(0, 12)) ? 12 : 0, oFile.getName().lastIndexOf('.')));
+		byte[] buffer = new byte[1024];
+		ZipInputStream zis = new ZipInputStream(new FileInputStream(oFile.getAbsolutePath()));
+		ZipEntry zipEntry = zis.getNextEntry();
+		while (zipEntry != null) {
+			File newFile = newFile(destDir, zipEntry);
+			if (!newFile.exists()) {
+				newFile.getParentFile().mkdirs();
+				FileOutputStream fos = new FileOutputStream(newFile);
+				int len;
+				while ((len = zis.read(buffer)) > 0) {
+					fos.write(buffer, 0, len);
+				}
+				fos.close();
+			}
+			zipEntry = zis.getNextEntry();
+		}
+		zis.closeEntry();
+		zis.close();
+	}
+
+	private static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+		File destFile = new File(destinationDir, zipEntry.getName());
+
+		String destDirPath = destinationDir.getCanonicalPath();
+		String destFilePath = destFile.getCanonicalPath();
+
+		if (!destFilePath.startsWith(destDirPath + File.separator)) {
+			throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+		}
+
+		return destFile;
+	}
+
+	public static boolean isNumeric(String strNum) {
+		if (strNum == null) {
+			return false;
+		}
+		try {
+			double d = Double.parseDouble(strNum);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
 	}
 }

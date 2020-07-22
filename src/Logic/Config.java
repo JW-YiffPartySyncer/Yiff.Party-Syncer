@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 public class Config {
-	public String strVersion = "0.4.7";
+	public String strVersion = "0.5";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -27,6 +27,11 @@ public class Config {
 
 	// Local save master folder
 	public String strSavepath = "W:\\Private\\yiffparty\\";
+
+	// Credentials for different websites.
+	// MEGA.nz
+	public String strMegaUser = "";
+	public String strMegaPW = "";
 
 	// UI Configuration
 	// Auto-Open default state
@@ -54,6 +59,10 @@ public class Config {
 	public boolean bDLWConvertPNGs = true;
 	// Quality of the converted JPGs. 0.95f = 95% JPG Quality
 	public float fDLWJPGQuality = 0.95f;
+	// Automatically try to unzip downloaded files.
+	public boolean bDLWAutoUnzip = true;
+	// If Link points to mega.nz, try to download the file with given credentials
+	public boolean bDLWMega = false;
 
 	// PatreonUpdater config
 	// Timeout for checking all tracked patreons for new posts
@@ -87,6 +96,9 @@ public class Config {
 		sb.append("DBPW:" + strDBPassword + ls);
 		sb.append("[Master]" + ls);
 		sb.append("SAVEPATH:" + strSavepath + ls);
+		sb.append("[Credentials]" + ls);
+		sb.append("MEGU:" + strMegaUser + ls);
+		sb.append("MEGPW:" + strMegaPW + ls);
 		sb.append("[UI]" + ls);
 		sb.append("UIAO:" + (bUIAutoOpen ? "TRUE" : "FALSE") + ls);
 		sb.append("[DLWorkers]" + ls);
@@ -97,6 +109,8 @@ public class Config {
 		sb.append("DLRT:" + iDLWRetryTimeout + ls);
 		sb.append("CONVERTPNG:" + (bDLWConvertPNGs ? "TRUE" : "FALSE") + ls);
 		sb.append("CVQUAL:" + fDLWJPGQuality + ls);
+		sb.append("DLAU:" + (bDLWAutoUnzip ? "TRUE" : "FALSE") + ls);
+		sb.append("DLMEGA:" + (bDLWMega ? "TRUE" : "FALSE") + ls);
 		sb.append("[PatreonWorkers]" + ls);
 		sb.append("PCHKT:" + iPatreonCheckTimeout + ls);
 		sb.append("PCHKFT:" + iPatreonCheckFailedTimeout + ls);
@@ -167,6 +181,12 @@ public class Config {
 				case "SAVEPATH":
 					strSavepath = strValue;
 					break;
+				case "MEGU":
+					strMegaUser = strValue;
+					break;
+				case "MEGPW":
+					strMegaPW = strValue;
+					break;
 				case "UIAO":
 					bUIAutoOpen = strValue.equals("TRUE");
 					break;
@@ -190,6 +210,12 @@ public class Config {
 					break;
 				case "CVQUAL":
 					fDLWJPGQuality = Float.parseFloat(strValue);
+					break;
+				case "DLAU":
+					bDLWAutoUnzip = strValue.equals("TRUE");
+					break;
+				case "DLMEGA":
+					bDLWMega = strValue.equals("TRUE");
 					break;
 				case "PCHKT":
 					iPatreonCheckTimeout = Integer.parseInt(strValue);

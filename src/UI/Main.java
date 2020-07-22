@@ -151,6 +151,28 @@ public class Main {
 			}
 		});
 		mnNewMenu_1.add(mntmNewMenuItem_2);
+
+		JMenu mnNewMenu_2 = new JMenu("Batch Actions");
+		menuBar.add(mnNewMenu_2);
+
+		JMenuItem mntmNewMenuItem_3 = new JMenuItem("Local - Search .zip and unzip");
+		mntmNewMenuItem_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				unzipLocal();
+			}
+		});
+		mnNewMenu_2.add(mntmNewMenuItem_3);
+
+		JMenu mnNewMenu_3 = new JMenu("Test");
+		menuBar.add(mnNewMenu_3);
+
+		JMenuItem mntmNewMenuItem_4 = new JMenuItem("Mega Download TestUI");
+		mntmNewMenuItem_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				testMegaUI();
+			}
+		});
+		mnNewMenu_3.add(mntmNewMenuItem_4);
 	}
 
 	/**
@@ -617,6 +639,17 @@ public class Main {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Spawns the Mega.nz Test UI
+	 */
+	private void testMegaUI() {
+		TestMega oT = new TestMega(this);
+	}
+
+	private void unzipLocal() {
+		UnzipLocal oU = new UnzipLocal(this);
 	}
 
 }

@@ -1,11 +1,16 @@
 # Yiff.Party-Syncer
 A grabber for yiff.party written in java
 
+Can download natively from yiff.party, as well as:
+- mega.nz
+
 # Pre-requisites
 * A fully set up Java IDE. I work with Eclipse.
 * A complete webserver package like XAMPP.
 - You need the SQL Server for storing metadata
 - If you want to use the Frontpage userscript grabber, you also need the webserver component
+* MegaCMD (optional for automatic Mega.nz downloading)
+- Downlaod and install from here: https://mega.nz/cmd
 
 # Steps to get your own instance up and running
 **Step 0: Clone the repo**
@@ -36,6 +41,16 @@ Paste the postdata.php in the webroot of a webserver running on localhost. edit 
 After you imported the userscript with your favourite script manager, leave the frontpage of yiff.party open in a browser window. 
 It will auto-refresh every 10 minutes and post the website data in the DB Server.
 
+**Step 5 (optional): Set up Mega.nz downloading**
+
+You need a mega.nz account for this feature. Also, downloads will obviously count to your transfer quota, and when your account runs out,
+you'll have to wait for the daily reset to continue downloading.
+Add the following directory to your system PATH Variable after you installed MegaCMD:
+(On Windows)
+C:\Users\"Username"\AppData\Local\MEGAcmd
+You can input your credentials on the settings page.
+Attention: If your password contains a "-" minus sign, the CMDlet will error out! Other special characters might break it too...
+
 And that's it! Now you can run it from your IDE or compile a run package.
 
 # Things to keep in mind
@@ -57,6 +72,10 @@ or you check the links that the Userscript has grabbed from the frontpage with t
 With "Yes" and "No" you can decide if you want to keep the selected, grabbed patreon for future tracking.
 
 This has been tested on Windows 10 with the Oracle JDK 1.8
+
+# Libs and APIs used:
+MEGAcmd4J - https://github.com/EliuX/MEGAcmd4J
+JSoup - https://jsoup.org/
 
 -------------------------------------------------------------------------------
 
