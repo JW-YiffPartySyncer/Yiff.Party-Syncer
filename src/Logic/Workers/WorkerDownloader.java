@@ -153,7 +153,7 @@ public class WorkerDownloader implements Runnable {
 										if (DO.strName.substring(DO.strName.lastIndexOf('.') + 1).equalsIgnoreCase("zip")) {
 											try {
 												System.out.println("Trying to unzip " + oDest.getAbsolutePath());
-												OUtil.unzipSameDir(oDest);
+												OUtil.unzipSameDir(oDest, oMain.oConf.bDLWConvertPNGs, this);
 												System.out.println("Unzip successfull of " + oDest.getAbsolutePath());
 											} catch (Exception e2) {
 												e2.printStackTrace();
@@ -209,9 +209,12 @@ public class WorkerDownloader implements Runnable {
 	 * @param strPath - Absolute path to the PNG that needs to be converted
 	 * @return Boolean whether file has successfully been converted.
 	 */
-	private boolean convert(String strPath) {
+	public boolean convert(String strPath) {
 		File input = new File(strPath);
 		File output = new File(strPath + ".jpg");
+		if (output.exists()) {
+			output.delete();
+		}
 		try {
 			System.out.println("Starting conversion on " + strPath);
 			output.createNewFile();

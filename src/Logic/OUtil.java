@@ -15,6 +15,8 @@ import java.sql.DriverManager;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import Logic.Workers.WorkerDownloader;
+
 /**
  * 
  * @author JW
@@ -78,7 +80,7 @@ public class OUtil {
 		return false;
 	}
 
-	public static void unzipSameDir(File oFile) throws IOException, IllegalArgumentException {
+	public static void unzipSameDir(File oFile, boolean convertPNG, WorkerDownloader convertWorker) throws IOException, IllegalArgumentException {
 		File destDir = new File(
 				oFile.getParentFile().getAbsolutePath() + "\\" + oFile.getName().substring(isNumeric(oFile.getName().substring(0, 12)) ? 12 : 0, oFile.getName().lastIndexOf('.')));
 		byte[] buffer = new byte[1024];
@@ -86,14 +88,26 @@ public class OUtil {
 		ZipEntry zipEntry = zis.getNextEntry();
 		while (zipEntry != null) {
 			File newFile = newFile(destDir, zipEntry);
+			if (newFile.exists() && !newFile.isDirectory() && zipEntry.isDirectory()) {
+				newFile.delete();
+			}
 			if (!newFile.exists()) {
 				newFile.getParentFile().mkdirs();
-				FileOutputStream fos = new FileOutputStream(newFile);
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
+				if (zipEntry.isDirectory()) {
+					newFile.mkdir();
+				} else {
+					FileOutputStream fos = new FileOutputStream(newFile);
+					int len;
+					while ((len = zis.read(buffer)) > 0) {
+						fos.write(buffer, 0, len);
+					}
+					fos.close();
 				}
-				fos.close();
+			}
+			if (newFile.getName().contains(".")) {
+				if (newFile.getName().substring(newFile.getName().lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
+					convertWorker.convert(newFile.getAbsolutePath());
+				}
 			}
 			zipEntry = zis.getNextEntry();
 		}

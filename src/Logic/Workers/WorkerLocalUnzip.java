@@ -22,10 +22,13 @@ public class WorkerLocalUnzip implements Runnable {
 
 	private int totalFiles = 0;
 	private int finishedFiles = 0;
+	
+	private WorkerDownloader oConverter;
 
 	public WorkerLocalUnzip(Main oMain, UnzipLocal oWindow) {
 		this.oMain = oMain;
 		this.oWindow = oWindow;
+		oConverter = new WorkerDownloader(null, oMain);
 	}
 
 	@Override
@@ -60,7 +63,7 @@ public class WorkerLocalUnzip implements Runnable {
 						if (oWindow != null) {
 							oWindow.lblAction.setText("Unzipping " + oFile.getAbsolutePath());
 						}
-						OUtil.unzipSameDir(oFile);
+						OUtil.unzipSameDir(oFile, oMain.oConf.bDLWConvertPNGs, oConverter);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
