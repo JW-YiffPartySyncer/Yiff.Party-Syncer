@@ -74,9 +74,13 @@ With "Yes" and "No" you can decide if you want to keep the selected, grabbed pat
 This has been tested on Windows 10 with the Oracle JDK 1.8
 
 # Libs and APIs used:
+
 MEGAcmd4J (source) - https://github.com/EliuX/MEGAcmd4J
+
 JSoup (lib) - https://jsoup.org/
+
 Apache Commons Compress (lib) - http://commons.apache.org/proper/commons-compress
+
 XZ for Java (source) - https://tukaani.org/xz/java.html
 
 -------------------------------------------------------------------------------
