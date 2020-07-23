@@ -20,6 +20,7 @@ import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 
 import Logic.Workers.WorkerDownloader;
+import Logic.Workers.WorkerPNGConverter;
 
 /**
  * 
@@ -84,7 +85,7 @@ public class OUtil {
 		return false;
 	}
 
-	public static void unzip7zSameDir(File oFile, boolean bConvert, WorkerDownloader convertWorker) throws IOException, Exception {
+	public static void unzip7zSameDir(File oFile, boolean bConvert, WorkerPNGConverter convertWorker) throws IOException, Exception {
 		unzip7z(oFile.getAbsolutePath(), oFile.getParentFile().getAbsolutePath(), bConvert, convertWorker);
 	}
 
@@ -96,7 +97,7 @@ public class OUtil {
 	 * @param strDestination
 	 * @throws IOException, Exception
 	 */
-	public static void unzip7z(String strArchive, String strDestination, boolean bConvert, WorkerDownloader convertWorker) throws IOException, Exception {
+	public static void unzip7z(String strArchive, String strDestination, boolean bConvert, WorkerPNGConverter convertWorker) throws IOException, Exception {
 		File oArchive = new File(strArchive);
 		File oDestination = new File(strDestination, oArchive.getName().substring(0, oArchive.getName().lastIndexOf(".")));
 		if (oDestination.exists()) {
@@ -157,7 +158,7 @@ public class OUtil {
 		}
 	}
 
-	public static void unzipSameDir(File oFile, boolean convertPNG, WorkerDownloader convertWorker) throws IOException, IllegalArgumentException {
+	public static void unzipSameDir(File oFile, boolean convertPNG, WorkerPNGConverter convertWorker) throws IOException, IllegalArgumentException {
 		File destDir = new File(
 				oFile.getParentFile().getAbsolutePath() + "\\" + oFile.getName().substring(isNumeric(oFile.getName().substring(0, 12)) ? 12 : 0, oFile.getName().lastIndexOf('.')));
 		byte[] buffer = new byte[1024];

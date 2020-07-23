@@ -43,6 +43,7 @@ import UI.Main;
 public class WorkerDownloader implements Runnable {
 
 	private WorkerDownloadManager oManager = null;
+	private WorkerPNGConverter oConverter;
 
 	private Connection connection;
 	private Statement statement;
@@ -61,6 +62,7 @@ public class WorkerDownloader implements Runnable {
 	public WorkerDownloader(WorkerDownloadManager oM, Main oMain) {
 		oManager = oM;
 		this.oMain = oMain;
+		oConverter = new WorkerPNGConverter(oMain, null);
 	}
 
 	/**
@@ -134,7 +136,7 @@ public class WorkerDownloader implements Runnable {
 							// are *big*
 							if (oMain.oConf.bDLWConvertPNGs) {
 								if (DO.strName.substring(DO.strName.lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
-									success = convert(oFile.getAbsolutePath());
+									success = oConverter.convert(oFile.getAbsolutePath());
 									if (success) {
 										oFile = new File(oFile.getAbsolutePath() + ".jpg");
 										bConverted = true;
@@ -153,7 +155,7 @@ public class WorkerDownloader implements Runnable {
 										if (DO.strName.substring(DO.strName.lastIndexOf('.') + 1).equalsIgnoreCase("zip")) {
 											try {
 												System.out.println("Trying to unzip " + oDest.getAbsolutePath());
-												OUtil.unzipSameDir(oDest, oMain.oConf.bDLWConvertPNGs, this);
+												OUtil.unzipSameDir(oDest, oMain.oConf.bDLWConvertPNGs, oConverter);
 												System.out.println("Unzip successfull of " + oDest.getAbsolutePath());
 											} catch (Exception e2) {
 												e2.printStackTrace();
@@ -161,7 +163,7 @@ public class WorkerDownloader implements Runnable {
 										} else if (DO.strName.substring(DO.strName.lastIndexOf('.') + 1).equalsIgnoreCase("7z")) {
 											try {
 												System.out.println("Trying to unzip " + oDest.getAbsolutePath());
-												OUtil.unzip7zSameDir(oDest, oMain.oConf.bDLWConvertPNGs, this);
+												OUtil.unzip7zSameDir(oDest, oMain.oConf.bDLWConvertPNGs, oConverter);
 												System.out.println("Unzip successfull of " + oDest.getAbsolutePath());
 											} catch (Exception e2) {
 												e2.printStackTrace();
@@ -205,54 +207,6 @@ public class WorkerDownloader implements Runnable {
 			}
 		}
 		bWorking = false;
-	}
-
-	/**
-	 * Convert a .png to .jpg. TODO: This routine uses *MUCH* RAM. app crashes with
-	 * OoM when converting big PNGs (10000x10000 and bigger, like seriously
-	 * unreasonably big) and -xmx is set to lower than 4G. So be on the safe side,
-	 * always launch with 8G as maximum ram. Converts the PNG at the same location,
-	 * will simply create a new file with [FILENAME].jpg
-	 * 
-	 * @param strPath - Absolute path to the PNG that needs to be converted
-	 * @return Boolean whether file has successfully been converted.
-	 */
-	public boolean convert(String strPath) {
-		File input = new File(strPath);
-		File output = new File(strPath + ".jpg");
-		if (output.exists()) {
-			output.delete();
-		}
-		try {
-			System.out.println("Starting conversion on " + strPath);
-			output.createNewFile();
-
-			BufferedImage image = ImageIO.read(input);
-			BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-			result.createGraphics().drawImage(image, 0, 0, Color.WHITE, null);
-			image.flush();
-			// ImageIO.write(result, "jpg", output);
-
-			Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
-			ImageWriter writer = iter.next();
-			ImageWriteParam iwp = writer.getDefaultWriteParam();
-			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-			iwp.setCompressionQuality(oMain.oConf.fDLWJPGQuality);
-			ImageOutputStream ios = ImageIO.createImageOutputStream(output);
-			writer.setOutput(ios);
-			writer.write(null, new IIOImage(result, null, null), iwp);
-			writer.dispose();
-			ios.close();
-			result.flush();
-
-			input.delete();
-			System.out.println("Converted " + output.getAbsolutePath());
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			output.delete();
-			return false;
-		}
 	}
 
 	/**
@@ -360,7 +314,7 @@ public class WorkerDownloader implements Runnable {
 			}
 		} else {
 			if (oFile.getName().substring(oFile.getName().lastIndexOf('.') + 1).equalsIgnoreCase("png")) {
-				convert(oFile.getAbsolutePath());
+				oConverter.convert(oFile.getAbsolutePath());
 			}
 		}
 	}

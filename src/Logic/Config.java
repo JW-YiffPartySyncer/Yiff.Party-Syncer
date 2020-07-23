@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 public class Config {
-	public String strVersion = "0.6";
+	public String strVersion = "0.6.1";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -27,6 +27,8 @@ public class Config {
 
 	// Local save master folder
 	public String strSavepath = "W:\\Private\\yiffparty\\";
+	// batch unzip max amount of PNG converters
+	public int iBatchPNGConverters = 8;
 
 	// Credentials for different websites.
 	// MEGA.nz
@@ -96,6 +98,7 @@ public class Config {
 		sb.append("DBPW:" + strDBPassword + ls);
 		sb.append("[Master]" + ls);
 		sb.append("SAVEPATH:" + strSavepath + ls);
+		sb.append("BPNGC#:" + iBatchPNGConverters + ls);
 		sb.append("[Credentials]" + ls);
 		sb.append("MEGU:" + strMegaUser + ls);
 		sb.append("MEGPW:" + strMegaPW + ls);
@@ -180,6 +183,9 @@ public class Config {
 					break;
 				case "SAVEPATH":
 					strSavepath = strValue;
+					break;
+				case "BPNGC#":
+					iBatchPNGConverters = Integer.parseInt(strValue);
 					break;
 				case "MEGU":
 					strMegaUser = strValue;
