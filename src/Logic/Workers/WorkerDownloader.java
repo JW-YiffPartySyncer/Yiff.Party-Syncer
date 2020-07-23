@@ -158,6 +158,14 @@ public class WorkerDownloader implements Runnable {
 											} catch (Exception e2) {
 												e2.printStackTrace();
 											}
+										} else if (DO.strName.substring(DO.strName.lastIndexOf('.') + 1).equalsIgnoreCase("7z")) {
+											try {
+												System.out.println("Trying to unzip " + oDest.getAbsolutePath());
+												OUtil.unzip7zSameDir(oDest, oMain.oConf.bDLWConvertPNGs, this);
+												System.out.println("Unzip successfull of " + oDest.getAbsolutePath());
+											} catch (Exception e2) {
+												e2.printStackTrace();
+											}
 										}
 									}
 									System.out.println("WorkerDownloader: finished " + DO.ID);

@@ -22,7 +22,7 @@ public class WorkerLocalUnzip implements Runnable {
 
 	private int totalFiles = 0;
 	private int finishedFiles = 0;
-	
+
 	private WorkerDownloader oConverter;
 
 	public WorkerLocalUnzip(Main oMain, UnzipLocal oWindow) {
@@ -35,6 +35,9 @@ public class WorkerLocalUnzip implements Runnable {
 	public void run() {
 		File oRootfolder = new File(oMain.oConf.strSavepath);
 		recurWork(oRootfolder);
+		if (oWindow != null) {
+			oWindow.lblStatus.setText("Finished.");
+		}
 	}
 
 	public void recurWork(File oFile) {
@@ -67,11 +70,17 @@ public class WorkerLocalUnzip implements Runnable {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+				} else if (oFile.getName().substring(oFile.getName().lastIndexOf('.') + 1).equalsIgnoreCase("7z")) {
+					try {
+						if(oWindow != null) {
+							oWindow.lblAction.setText("Unzipping " + oFile.getAbsolutePath());
+						}
+						OUtil.unzip7zSameDir(oFile, oMain.oConf.bDLWConvertPNGs, oConverter);
+					} catch (Exception e2) {
+						e2.printStackTrace();
+					}
 				}
 			}
-		}
-		if (oWindow != null) {
-			oWindow.lblStatus.setText("Finished.");
 		}
 	}
 

@@ -434,7 +434,9 @@ public class WorkerPatreonUpdater implements Runnable {
 		for (String strLine : aData) {
 			if (strLine.contains("mega.nz/")) {
 				String strLink = strLine.substring(strLine.indexOf('"') + 1, strLine.indexOf('"', strLine.indexOf('"') + 1));
-				updatePosts(strName, strLink, strID, strTitle, strTimestamp);
+				if (!strLink.equals("https://mega.nz/")) {
+					updatePosts(strName, strLink, strID, strTitle, strTimestamp);
+				}
 			}
 		}
 		return;

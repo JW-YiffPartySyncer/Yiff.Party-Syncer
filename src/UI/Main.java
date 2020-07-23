@@ -32,6 +32,8 @@ import Logic.Workers.WorkerCreatorParser;
 import Logic.Workers.WorkerDownloadManager;
 import Logic.Workers.WorkerPatreonUpdater;
 import Logic.Workers.WorkerUIUpdater;
+import UI.Test.Test7z;
+import UI.Test.TestMega;
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -173,6 +175,14 @@ public class Main {
 			}
 		});
 		mnNewMenu_3.add(mntmNewMenuItem_4);
+
+		JMenuItem mntmNewMenuItem_5 = new JMenuItem("7z Decompress TestUI");
+		mntmNewMenuItem_5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				test7z();
+			}
+		});
+		mnNewMenu_3.add(mntmNewMenuItem_5);
 	}
 
 	/**
@@ -646,6 +656,10 @@ public class Main {
 	 */
 	private void testMegaUI() {
 		TestMega oT = new TestMega(this);
+	}
+
+	private void test7z() {
+		Test7z oT = new Test7z();
 	}
 
 	private void unzipLocal() {
