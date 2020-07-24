@@ -135,6 +135,12 @@ public class WorkerPatreonUpdater implements Runnable {
 			cont = parseGlobal(strLink, i, name);
 			i++;
 			if (cont) {
+				// Wait in between sites, as to not DDoS yiff.party
+				try {
+					Thread.sleep(oMain.oConf.iPatrenConsecutiveSiteTimeout);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				do {
 					System.out.println("Cont page " + i);
 					cont = parseGlobal(strLink + "?p=" + i, i, false);

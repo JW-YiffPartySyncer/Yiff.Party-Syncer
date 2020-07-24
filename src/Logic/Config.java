@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 public class Config {
-	public String strVersion = "0.6.2";
+	public String strVersion = "0.6.3";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -71,6 +71,8 @@ public class Config {
 	public int iPatreonCheckTimeout = (1000 * 60 * 60 * 24); // 1 day
 	// Timeout for rechecking if yiff.party is down while we checked a patreon
 	public int iPatreonCheckFailedTimeout = (1000 * 60 * 60 * 1); // 1 hour
+	// Wait time in between same-patreon consecutive sites
+	public int iPatrenConsecutiveSiteTimeout = (1000 * 60); // 1 second
 	// Wait time in between consecutive checks
 	public int iPatreonWaitTimeout = (1000 * 60); // 1 second
 

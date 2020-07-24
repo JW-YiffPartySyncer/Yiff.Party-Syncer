@@ -35,6 +35,8 @@ public class WorkerLocalUnzip implements Runnable {
 
 	@Override
 	public void run() {
+		File oRootfolder = new File(oMain.oConf.strSavepath);
+		recurWork(oRootfolder);
 		for (int i = 0; i < oMain.oConf.iBatchPNGConverters; i++) {
 			WorkerPNGConverter oC = new WorkerPNGConverter(oMain, aConvertQueue);
 			aConverters.add(oC);
@@ -43,12 +45,13 @@ public class WorkerLocalUnzip implements Runnable {
 			oThread.start();
 			aThreads.add(oThread);
 		}
-		File oRootfolder = new File(oMain.oConf.strSavepath);
-		recurWork(oRootfolder);
 		if (oWindow != null) {
-			oWindow.lblStatus.setText("Waiting for converters to finish work.");
+			oWindow.lblAction.setText("Waiting for converters to finish work.");
 		}
 		while (aConvertQueue.size() > 1) {
+			if(oWindow != null) {
+				oWindow.lblStatus.setText("Remaining Images: " + aConvertQueue.size());
+			}
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
