@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -132,6 +131,7 @@ public class WorkerPatreonUpdater implements Runnable {
 				}
 			}
 			int i = 1;
+			// Intro to recursive patreon parsing. i = 1, cause we want the first site.
 			cont = parseGlobal(strLink, i, name);
 			i++;
 			if (cont) {
@@ -154,9 +154,28 @@ public class WorkerPatreonUpdater implements Runnable {
 	 */
 	private String[] prettify(String strData) {
 		ArrayList<String> aResult = new ArrayList<String>();
-		while (strData.indexOf(">") > 1) {
-			aResult.add(strData.substring(0, strData.indexOf(">") + 1) + System.lineSeparator());
-			strData = strData.substring(strData.indexOf(">") + 1);
+		char[] aData = strData.toCharArray();
+		int iStart = 0;
+		int iEnd = 0;
+		boolean bFound = true;
+		StringBuilder sb = new StringBuilder();
+		while (bFound) {
+			bFound = false;
+			for (int i = iStart; i < aData.length; i++) {
+				if (aData[i] == '>') {
+					bFound = true;
+					iEnd = i;
+					break;
+				}
+			}
+			if (bFound) {
+				for (int i = iStart; i <= iEnd; i++) {
+					sb.append(aData[i]);
+				}
+				aResult.add(sb.toString());
+				sb.setLength(0);
+			}
+			iStart = iEnd + 1;
 		}
 		String[] result = new String[aResult.size()];
 		for (int i = 0; i < aResult.size(); i++) {
