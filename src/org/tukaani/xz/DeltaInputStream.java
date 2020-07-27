@@ -52,9 +52,11 @@ public class DeltaInputStream extends InputStream {
         // in this constructor.
         if (in == null)
             throw new NullPointerException();
-
-        this.in = in;
-        this.delta = new DeltaDecoder(distance);
+        
+        throw new NullPointerException();
+        
+        //this.in = in;
+        //this.delta = new DeltaDecoder(distance);
     }
 
     /**

@@ -50,6 +50,7 @@ public class Category extends JFrame {
 
 	private ArrayList<Integer> aComboboxCategoriesIDs = new ArrayList<Integer>();
 	private ArrayList<Integer> aComboboxPatreonsIDs = new ArrayList<Integer>();
+	private ArrayList<String> aCategoryPaths = new ArrayList<String>();
 
 	/**
 	 * Create the frame.
@@ -176,6 +177,7 @@ public class Category extends JFrame {
 		textFieldName.setText("");
 		textFieldSubfolder.setText("");
 		comboBoxPatreonCategory.removeAllItems();
+		aCategoryPaths.clear();
 		try {
 			resultSet = statement.executeQuery("SELECT * FROM categories");
 			if (resultSet != null) {
@@ -188,6 +190,7 @@ public class Category extends JFrame {
 							textFieldSubfolder.setText(resultSet.getString("path"));
 						}
 						aComboboxCategoriesIDs.add(resultSet.getInt("ID"));
+						aCategoryPaths.add(resultSet.getString("path"));
 					} while (resultSet.next());
 				}
 			}
@@ -334,7 +337,7 @@ public class Category extends JFrame {
 	 */
 	private void recategorizeAndMove() {
 		String strOldCatPath = comboBoxCategories.getItemAt(comboBoxCategories.getSelectedIndex());
-		String strNewCatPath = comboBoxPatreonCategory.getItemAt(comboBoxPatreonCategory.getSelectedIndex());
+		String strNewCatPath = aCategoryPaths.get(comboBoxPatreonCategory.getSelectedIndex());
 		lblStatusRelocate.setText("");
 		try {
 			resultSet = statement.executeQuery("SELECT * FROM patreons WHERE ID = " + aComboboxPatreonsIDs.get(comboBoxPatreons.getSelectedIndex()));
