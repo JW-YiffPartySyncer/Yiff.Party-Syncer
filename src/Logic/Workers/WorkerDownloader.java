@@ -108,6 +108,9 @@ public class WorkerDownloader implements Runnable {
 						// Try to download the File.
 						website = new URL(DO.strURL);
 						int iFilesize = getFileSize(website);
+						if(iFilesize == -1) {
+							updatePost(DO, false, true);
+						}
 						URLConnection conn = website.openConnection();
 						conn.setReadTimeout(1000 * 30);
 						conn.setConnectTimeout(1000 * 15);
@@ -234,6 +237,9 @@ public class WorkerDownloader implements Runnable {
 			}
 			conn.getInputStream();
 			return conn.getContentLength();
+		} catch (FileNotFoundException fnf) {
+			fnf.printStackTrace();
+			return -1;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -253,7 +259,12 @@ public class WorkerDownloader implements Runnable {
 			i++;
 		}
 		oTempFolder.mkdir();
-		MegaSession megaSession = Mega.login(new MegaAuthCredentials(oMain.oConf.strMegaUser, oMain.oConf.strMegaPW));
+		MegaSession megaSession = null;
+		try {
+			megaSession = Mega.login(new MegaAuthCredentials(oMain.oConf.strMegaUser, oMain.oConf.strMegaPW));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		boolean bSuccess = true;
 		try {
 			megaSession.get(DO.strURL, oTempFolder.getAbsolutePath()).run();

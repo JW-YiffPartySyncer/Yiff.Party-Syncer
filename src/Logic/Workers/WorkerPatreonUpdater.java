@@ -135,16 +135,16 @@ public class WorkerPatreonUpdater implements Runnable {
 			cont = parseGlobal(strLink, i, name);
 			i++;
 			if (cont) {
-				// Wait in between sites, as to not DDoS yiff.party
-				try {
-					Thread.sleep(oMain.oConf.iPatrenConsecutiveSiteTimeout);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 				do {
 					System.out.println("Cont page " + i);
 					cont = parseGlobal(strLink + "?p=" + i, i, false);
 					i++;
+					// Wait in between sites, as to not DDoS yiff.party
+					try {
+						Thread.sleep(oMain.oConf.iPatrenConsecutiveSiteTimeout);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				} while (cont);
 			}
 		}
@@ -458,9 +458,20 @@ public class WorkerPatreonUpdater implements Runnable {
 		String[] aData = prettify(strData);
 		for (String strLine : aData) {
 			if (strLine.contains("mega.nz/")) {
-				String strLink = strLine.substring(strLine.indexOf('"') + 1, strLine.indexOf('"', strLine.indexOf('"') + 1));
-				if (!strLink.equals("https://mega.nz/")) {
-					updatePosts(strName, strLink, strID, strTitle, strTimestamp);
+				try {
+					String strLink = "";
+					if (strLine.startsWith("http")) {
+						strLink = strLine.substring(0, strLine.indexOf('<'));
+					} else if (strLine.contains("")) {
+						strLink = strLine.substring(strLine.indexOf('"') + 1, strLine.indexOf('"', strLine.indexOf('"') + 1));
+					} else {
+						continue; //TODO: improve Mega Link scanning
+					}
+					if (!strLink.equals("https://mega.nz/")) {
+						updatePosts(strName, strLink, strID, strTitle, strTimestamp);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}

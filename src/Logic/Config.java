@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 public class Config {
-	public String strVersion = "0.6.3";
+	public String strVersion = "0.6.4";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -72,9 +72,9 @@ public class Config {
 	// Timeout for rechecking if yiff.party is down while we checked a patreon
 	public int iPatreonCheckFailedTimeout = (1000 * 60 * 60 * 1); // 1 hour
 	// Wait time in between same-patreon consecutive sites
-	public int iPatrenConsecutiveSiteTimeout = (1000 * 60); // 1 second
+	public int iPatrenConsecutiveSiteTimeout = (1000 * 1); // 1 second
 	// Wait time in between consecutive checks
-	public int iPatreonWaitTimeout = (1000 * 60); // 1 second
+	public int iPatreonWaitTimeout = (1000 * 60); // 1 minute
 
 	public Config() {
 		loadData();
@@ -119,6 +119,7 @@ public class Config {
 		sb.append("[PatreonWorkers]" + ls);
 		sb.append("PCHKT:" + iPatreonCheckTimeout + ls);
 		sb.append("PCHKFT:" + iPatreonCheckFailedTimeout + ls);
+		sb.append("PCST:" + iPatrenConsecutiveSiteTimeout + ls);
 		sb.append("PWT:" + iPatreonWaitTimeout + ls);
 		sb.append("//eof");
 
@@ -230,6 +231,9 @@ public class Config {
 					break;
 				case "PCHKFT":
 					iPatreonCheckFailedTimeout = Integer.parseInt(strValue);
+					break;
+				case "PCST":
+					iPatrenConsecutiveSiteTimeout = Integer.parseInt(strValue);
 					break;
 				case "PWT":
 					iPatreonWaitTimeout = Integer.parseInt(strValue);

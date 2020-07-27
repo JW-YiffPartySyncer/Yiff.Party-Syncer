@@ -131,6 +131,7 @@ public class WorkerRelocater implements Runnable {
 			for (File file : sourceFile.listFiles()) {
 				moveOwn(file, new File(destFile.getAbsolutePath() + "\\" + file.getName()));
 			}
+			sourceFile.delete();
 		} else {
 			try {
 				System.out.println("move file " + sourceFile.getAbsolutePath() + " to " + destFile.getAbsolutePath());
