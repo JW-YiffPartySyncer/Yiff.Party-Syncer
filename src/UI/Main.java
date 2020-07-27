@@ -165,6 +165,14 @@ public class Main {
 		});
 		mnNewMenu_2.add(mntmNewMenuItem_3);
 
+		JMenuItem mntmNewMenuItem_6 = new JMenuItem("Batch-Convert PNGs");
+		mntmNewMenuItem_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				batchConvertPNGs();
+			}
+		});
+		mnNewMenu_2.add(mntmNewMenuItem_6);
+
 		JMenu mnNewMenu_3 = new JMenu("Test");
 		menuBar.add(mnNewMenu_3);
 
@@ -658,12 +666,22 @@ public class Main {
 		TestMega oT = new TestMega(this);
 	}
 
+	/**
+	 * Spawns the 7Zip Unpack Test UI
+	 */
 	private void test7z() {
 		Test7z oT = new Test7z();
 	}
 
+	/**
+	 * Tries to start the Batch-unzip worker
+	 */
 	private void unzipLocal() {
 		UnzipLocal oU = new UnzipLocal(this);
+	}
+
+	private void batchConvertPNGs() {
+		BatchConvertPNGs oBCPNGs = new BatchConvertPNGs(this);
 	}
 
 }

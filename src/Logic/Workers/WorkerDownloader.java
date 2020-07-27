@@ -21,6 +21,8 @@ import java.util.Random;
 import Lib.mega.Mega;
 import Lib.mega.MegaSession;
 import Lib.mega.auth.MegaAuthCredentials;
+import Lib.mega.error.MegaInvalidStateException;
+import Lib.mega.error.MegaWrongArgumentsException;
 import Logic.DownloadObject;
 import Logic.OUtil;
 import UI.Main;
@@ -108,7 +110,7 @@ public class WorkerDownloader implements Runnable {
 						// Try to download the File.
 						website = new URL(DO.strURL);
 						int iFilesize = getFileSize(website);
-						if(iFilesize == -1) {
+						if (iFilesize == -1) {
 							updatePost(DO, false, true);
 						}
 						URLConnection conn = website.openConnection();
@@ -262,6 +264,13 @@ public class WorkerDownloader implements Runnable {
 		MegaSession megaSession = null;
 		try {
 			megaSession = Mega.login(new MegaAuthCredentials(oMain.oConf.strMegaUser, oMain.oConf.strMegaPW));
+		} catch (MegaInvalidStateException ei) {
+			megaSession = Mega.currentSession();
+			megaSession.logout();
+			ei.printStackTrace();
+		} catch (MegaWrongArgumentsException efnf) {
+			updatePost(DO, false, true);
+			efnf.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
