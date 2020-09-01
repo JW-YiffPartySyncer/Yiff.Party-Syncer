@@ -42,6 +42,13 @@ public class WorkerCreatorParser implements Runnable {
 		while (true) {
 			if (statement != null) {
 				try {
+					if(statement.isClosed()) {
+						statement = connection.createStatement();
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				try {
 					resultSet = statement.executeQuery("SELECT * FROM webrip LIMIT 1"); // Get one line from the database. should represent a line in the front page
 																						// yiff.party html
 				} catch (SQLException e) {

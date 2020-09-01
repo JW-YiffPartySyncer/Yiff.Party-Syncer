@@ -111,6 +111,9 @@ public class WorkerDownloadManager implements Runnable {
 		for (int i = 0; i < aDOs.size(); i++) {
 			sb.append(" AND ID != " + aDOs.get(i).ID);
 		}
+		if (!oMain.oConf.bDLWMega) {
+			sb.append(" AND href NOT LIKE '%mega.nz%'");
+		}
 		sb.append(" ORDER BY last_checked ASC LIMIT 1");
 
 		try {
@@ -150,7 +153,7 @@ public class WorkerDownloadManager implements Runnable {
 									if (resultSet2 != null) {
 										if (resultSet2.next()) {
 											if (strRoot != null) {
-												DO.strPath = oMain.oConf.strSavepath  + resultSet2.getString("path") + strRoot + "\\"+ strTimestamp
+												DO.strPath = oMain.oConf.strSavepath + resultSet2.getString("path") + strRoot + "\\" + strTimestamp
 														+ strName.substring(0, strName.lastIndexOf('.')) + DO.ID + strName.substring(strName.lastIndexOf('.'));
 												aDOs.add(DO);
 												aQueue.put(DO);

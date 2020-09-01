@@ -275,6 +275,8 @@ public class WorkerPatreonUpdater implements Runnable {
 				String strID = IDholder.attr("id");
 
 				String strTimestamp = extractTimestamp(IDholder.toString());
+				
+				
 
 				// Try to extract attachments
 				Element attachment = card.select("div[class=card-attachments]").first();

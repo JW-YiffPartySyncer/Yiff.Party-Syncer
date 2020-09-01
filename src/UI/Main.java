@@ -34,6 +34,7 @@ import Logic.Workers.WorkerPatreonUpdater;
 import Logic.Workers.WorkerUIUpdater;
 import UI.Test.Test7z;
 import UI.Test.TestMega;
+import UI.Test.TestRAR;
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -191,6 +192,14 @@ public class Main {
 			}
 		});
 		mnNewMenu_3.add(mntmNewMenuItem_5);
+		
+		JMenuItem mntmNewMenuItem_7 = new JMenuItem("RAR Decompress TestUI");
+		mntmNewMenuItem_7.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				testRAR();
+			}
+		});
+		mnNewMenu_3.add(mntmNewMenuItem_7);
 	}
 
 	/**
@@ -682,6 +691,10 @@ public class Main {
 
 	private void batchConvertPNGs() {
 		BatchConvertPNGs oBCPNGs = new BatchConvertPNGs(this);
+	}
+	
+	private void testRAR() {
+		TestRAR oRAR = new TestRAR();
 	}
 
 }
