@@ -275,8 +275,17 @@ public class WorkerPatreonUpdater implements Runnable {
 				String strID = IDholder.attr("id");
 
 				String strTimestamp = extractTimestamp(IDholder.toString());
-				
-				
+
+				// Try to extract post text body
+				String strBody = null;
+				try {
+					strBody = card.select("div[class=post-body]").text();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				if (strBody != null) {
+					updatePostText(strID, strBody);
+				}
 
 				// Try to extract attachments
 				Element attachment = card.select("div[class=card-attachments]").first();
@@ -456,6 +465,43 @@ public class WorkerPatreonUpdater implements Runnable {
 		return strResult;
 	}
 
+	/**
+	 * Try and insert Post text body, if not exists
+	 * @param strID - ID of the Post on yiff.party
+	 * @param strData - Text Body of the post message
+	 */
+	private void updatePostText(String strID, String strData) {
+		ResultSet ownSet = null;
+		try {
+			ownSet = statement.executeQuery("SELECT * FROM posttext WHERE postID = '" + strID + "'");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		boolean cont = false;
+		if (ownSet != null) {
+			try {
+				if(ownSet.next()) {
+					if(ownSet.getString("text").equals("") && !strData.equals("")) {
+						cont = true;
+					}
+				} else {
+					cont = true;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		if(cont) {
+			strData = strData.replaceAll("'", "\\\\'");
+			try {
+				statement.executeUpdate("INSERT INTO posttext (postID, text) VALUES ('" + strID + "', '" + strData + "')");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return;
+	}
+
 	private void scanForMEGALinks(String strData, String strName, String strID, String strTitle, String strTimestamp) {
 		String[] aData = prettify(strData);
 		for (String strLine : aData) {
@@ -467,7 +513,7 @@ public class WorkerPatreonUpdater implements Runnable {
 					} else if (strLine.contains("")) {
 						strLink = strLine.substring(strLine.indexOf('"') + 1, strLine.indexOf('"', strLine.indexOf('"') + 1));
 					} else {
-						continue; //TODO: improve Mega Link scanning
+						continue; // TODO: improve Mega Link scanning
 					}
 					if (!strLink.equals("https://mega.nz/")) {
 						updatePosts(strName, strLink, strID, strTitle, strTimestamp);

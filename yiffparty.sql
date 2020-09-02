@@ -1,5 +1,4 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -37,6 +36,12 @@ CREATE TABLE `posts` (
   `last_checked` bigint(20) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 
+CREATE TABLE `posttext` (
+  `ID` int(11) NOT NULL,
+  `postID` tinytext NOT NULL,
+  `text` mediumtext DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
+
 CREATE TABLE `webrip` (
   `ID` int(11) NOT NULL,
   `Timestamp` int(11) NOT NULL,
@@ -56,6 +61,10 @@ ALTER TABLE `posts`
   ADD KEY `HASH` (`href`(768)) USING HASH,
   ADD KEY `downloaded_ID_lastChecked` (`downloaded`,`ID`,`last_checked`);
 
+ALTER TABLE `posttext`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `postID_Index` (`postID`(255));
+
 ALTER TABLE `webrip`
   ADD PRIMARY KEY (`ID`);
 
@@ -69,10 +78,12 @@ ALTER TABLE `patreons`
 ALTER TABLE `posts`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE `posttext`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `webrip`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
-COMMIT;
-
+  
 INSERT INTO `categories` (`name`, `path`) VALUES ("Uncategorized", "Uncategorized\\"); 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
