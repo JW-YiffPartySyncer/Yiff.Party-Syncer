@@ -147,12 +147,14 @@ public class WorkerDownloader implements Runnable {
 									Files.copy(Paths.get(oFile.getPath()), Paths.get(oDest.getPath()), StandardCopyOption.REPLACE_EXISTING);
 									updatePost(DO, true, false);
 									// Auto-unzip
+									boolean conv = false;
 									if (oMain.oConf.bDLWAutoUnzip) {
 										if (DO.strName.substring(DO.strName.lastIndexOf('.') + 1).equalsIgnoreCase("zip")) {
 											try {
 												System.out.println("Trying to unzip " + oDest.getAbsolutePath());
 												OUtil.unzipSameDir(oDest, oMain.oConf.bDLWConvertPNGs, oConverter);
 												System.out.println("Unzip successfull of " + oDest.getAbsolutePath());
+												conv = true;
 											} catch (Exception e2) {
 												e2.printStackTrace();
 											}
@@ -161,10 +163,14 @@ public class WorkerDownloader implements Runnable {
 												System.out.println("Trying to unzip " + oDest.getAbsolutePath());
 												OUtil.unzip7zSameDir(oDest, oMain.oConf.bDLWConvertPNGs, oConverter);
 												System.out.println("Unzip successfull of " + oDest.getAbsolutePath());
+												conv = true;
 											} catch (Exception e2) {
 												e2.printStackTrace();
 											}
 										}
+									}
+									if (conv) {
+										recurPNGConvert(new File(oDest.getAbsolutePath().substring(0, oDest.getAbsolutePath().lastIndexOf("."))));
 									}
 									System.out.println("WorkerDownloader: finished " + DO.ID);
 								} catch (IOException ioe) {

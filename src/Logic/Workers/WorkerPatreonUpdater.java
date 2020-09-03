@@ -492,6 +492,7 @@ public class WorkerPatreonUpdater implements Runnable {
 			}
 		}
 		if(cont) {
+			strData = strData.replaceAll("\\\\", "\\\\\\\\");
 			strData = strData.replaceAll("'", "\\\\'");
 			try {
 				statement.executeUpdate("INSERT INTO posttext (postID, text) VALUES ('" + strID + "', '" + strData + "')");

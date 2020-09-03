@@ -30,6 +30,7 @@ import Logic.Config;
 import Logic.OUtil;
 import Logic.Workers.WorkerCreatorParser;
 import Logic.Workers.WorkerDownloadManager;
+import Logic.Workers.WorkerLocalDownloadChecker;
 import Logic.Workers.WorkerPatreonUpdater;
 import Logic.Workers.WorkerUIUpdater;
 import UI.Test.Test7z;
@@ -172,6 +173,14 @@ public class Main {
 				batchConvertPNGs();
 			}
 		});
+
+		JMenuItem mntmNewMenuItem_8 = new JMenuItem("Local - Check all downloads");
+		mntmNewMenuItem_8.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				checkAllDownloads();
+			}
+		});
+		mnNewMenu_2.add(mntmNewMenuItem_8);
 		mnNewMenu_2.add(mntmNewMenuItem_6);
 
 		JMenu mnNewMenu_3 = new JMenu("Test");
@@ -192,7 +201,7 @@ public class Main {
 			}
 		});
 		mnNewMenu_3.add(mntmNewMenuItem_5);
-		
+
 		JMenuItem mntmNewMenuItem_7 = new JMenuItem("RAR Decompress TestUI");
 		mntmNewMenuItem_7.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -692,9 +701,20 @@ public class Main {
 	private void batchConvertPNGs() {
 		BatchConvertPNGs oBCPNGs = new BatchConvertPNGs(this);
 	}
-	
+
 	private void testRAR() {
 		TestRAR oRAR = new TestRAR();
+	}
+
+	/**
+	 * Spawns a worker thread that checks all downloaded files
+	 */
+	private void checkAllDownloads() {
+		DownloadCheck ui = new DownloadCheck();
+		WorkerLocalDownloadChecker oChecker = new WorkerLocalDownloadChecker(this, ui);
+		Thread oThread = new Thread(oChecker);
+		oThread.setName("WorkerLocalDownloadChecker");
+		oThread.start();
 	}
 
 }
