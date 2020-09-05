@@ -15,7 +15,7 @@ public class DownloadObject {
 	public int iPatreonID;
 	public String strName;
 	
-	public int iTimeout;
+	public long lTimeout;
 
 	public boolean invalid = false;
 	public boolean finished;

@@ -37,6 +37,9 @@ public class WorkerDownloadManager implements Runnable {
 	public int iWorkerIndex = -1; // Last running worker in the aDownloaders ArrayList
 	private boolean bArrayAccess = false;
 
+	private final int iQuerySize = 1000;
+	private long lNextCheck = 0;
+
 	public WorkerDownloadManager(Main oMain) {
 		this.oMain = oMain;
 	}
@@ -65,14 +68,10 @@ public class WorkerDownloadManager implements Runnable {
 
 		while (true) {
 			checkQueue();
-			if (aDOs.size() < oMain.oConf.iDLBuffer) {
+			if (aDOs.size() < oMain.oConf.iDLBuffer && System.currentTimeMillis() > lNextCheck) {
 				if (!getNewDO()) {
 					System.out.println("WorkerDownloadManager: nothing to download. Wait 1 minute");
-					try {
-						Thread.sleep(1000 * 60);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					lNextCheck = System.currentTimeMillis() + (1000 * 60);
 				}
 			}
 			checkWorkers();
@@ -101,7 +100,7 @@ public class WorkerDownloadManager implements Runnable {
 			aDOs.removeAll(aTemp);
 		}
 		for (int i = 0; i < aDOsTimeout.size(); i++) {
-			if (aDOsTimeout.get(i).iTimeout < System.currentTimeMillis()) {
+			if (aDOsTimeout.get(i).lTimeout < System.currentTimeMillis()) {
 				aTemp.add(aDOsTimeout.get(i));
 			}
 		}
@@ -118,8 +117,6 @@ public class WorkerDownloadManager implements Runnable {
 	 * @return - success?
 	 */
 	private boolean getNewDO() {
-		DownloadObject DO = new DownloadObject();
-
 		StringBuilder sb = new StringBuilder();
 		sb.append("SELECT * FROM posts WHERE downloaded = FALSE AND last_checked < " + (System.currentTimeMillis() - oMain.oConf.iDLWRetryTimeoutInitial));
 		for (int i = 0; i < aDOs.size(); i++) {
@@ -131,87 +128,109 @@ public class WorkerDownloadManager implements Runnable {
 		if (!oMain.oConf.bDLWMega) {
 			sb.append(" AND href NOT LIKE '%mega.nz%'");
 		}
-		sb.append(" ORDER BY last_checked ASC LIMIT 1");
+		sb.append(" ORDER BY last_checked ASC LIMIT " + iQuerySize);
 
 		try {
 			resultSet = statement.executeQuery(sb.toString());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		if (resultSet != null) {
-			try {
-				if (resultSet.next()) {
-					String strName = null;
-					String strTimestamp = null;
-					int patreon = -1;
-					try {
-						DO.ID = resultSet.getInt("ID");
-						DO.strURL = resultSet.getString("href");
-						strName = resultSet.getString("name");
-						DO.strName = strName;
-						patreon = resultSet.getInt("patreon");
-						strTimestamp = resultSet.getString("date");
-					} catch (SQLException e) {
-						e.printStackTrace();
-						return false;
-					}
 
-					if (resultSet.getInt("failcount") >= 1) {
-						int additionalTime = (int) (oMain.oConf.iDLWRetryTimeoutInitial * (oMain.oConf.fDLWRetryMultiplier * resultSet.getInt("failcount")));
-						if (resultSet.getInt("last_checked") + (additionalTime > oMain.oConf.iDLWRetryTimeoutMax ? additionalTime : oMain.oConf.iDLWRetryTimeoutMax) > System
-								.currentTimeMillis()) {
-							DO.iTimeout = resultSet.getInt("last_checked") + additionalTime > oMain.oConf.iDLWRetryTimeoutMax ? additionalTime : oMain.oConf.iDLWRetryTimeoutMax;
-							aDOsTimeout.add(DO);
-							System.out.println("WorkerDownloadManager: ignore " + DO.ID + " for " + ((DO.iTimeout - System.currentTimeMillis()) / 1000) + " seconds");
-						}
-						return true;
-					}
-
-					if (strName != null && patreon != -1) {
+		boolean bReturn = false;
+		boolean bReachedEnd = false;
+		int iCounter = 0;
+		while (aDOs.size() < oMain.oConf.iDLBuffer) {
+			DownloadObject DO = new DownloadObject();
+			iCounter++;
+			if (resultSet != null) {
+				try {
+					if (resultSet.next()) {
+						String strName = null;
+						String strTimestamp = null;
+						int patreon = -1;
 						try {
-							resultSet = statement.executeQuery("SELECT * FROM patreons WHERE ID = " + patreon);
+							DO.ID = resultSet.getInt("ID");
+							DO.strURL = resultSet.getString("href");
+							strName = resultSet.getString("name");
+							DO.strName = strName;
+							patreon = resultSet.getInt("patreon");
+							strTimestamp = resultSet.getString("date");
 						} catch (SQLException e) {
 							e.printStackTrace();
+							bReturn = false;
+							break;
 						}
-						if (resultSet != null) {
+
+						if (resultSet.getInt("failcount") >= 1) {
+							int additionalTime = (int) (oMain.oConf.iDLWRetryTimeoutInitial * (oMain.oConf.fDLWRetryMultiplier * resultSet.getInt("failcount")));
+							long lastChecked = resultSet.getLong("last_checked");
+							if (lastChecked + (additionalTime > oMain.oConf.iDLWRetryTimeoutMax ? additionalTime : oMain.oConf.iDLWRetryTimeoutMax) > System.currentTimeMillis()) {
+								DO.lTimeout = lastChecked + (additionalTime > oMain.oConf.iDLWRetryTimeoutMax ? additionalTime : oMain.oConf.iDLWRetryTimeoutMax);
+								aDOsTimeout.add(DO);
+								System.out.println("WorkerDownloadManager: ignore " + DO.ID + " for " + ((DO.lTimeout - System.currentTimeMillis()) / 1000) + " seconds");
+								bReturn = true;
+								continue;
+							}
+							bReturn = true;
+						}
+
+						if (strName != null && patreon != -1) {
+							Statement st2 = connection.createStatement();
+							ResultSet rs2 = null;
 							try {
-								if (resultSet.next()) {
-									String strRoot = resultSet.getString("name");
-									ResultSet resultSet2 = statement.executeQuery(
-											"SELECT * FROM categories WHERE ID = " + (resultSet.getInt("category") == 0 ? " 1 OR ID = 0" : resultSet.getInt("category")));
-									if (resultSet2 != null) {
-										if (resultSet2.next()) {
-											if (strRoot != null) {
-												DO.strPath = oMain.oConf.strSavepath + resultSet2.getString("path") + strRoot + "\\" + strTimestamp
-														+ strName.substring(0, strName.lastIndexOf('.')) + DO.ID + strName.substring(strName.lastIndexOf('.'));
-												aDOs.add(DO);
-												aQueue.put(DO);
-												return true;
-											}
-										} else {
-											return false;
-										}
-									} else {
-										return false;
-									}
-								} else {
-									return false;
-								}
-							} catch (SQLException | InterruptedException e) {
+								rs2 = st2.executeQuery("SELECT * FROM patreons WHERE ID = " + patreon);
+							} catch (SQLException e) {
 								e.printStackTrace();
 							}
+							if (rs2 != null) {
+								try {
+									if (rs2.next()) {
+										String strRoot = resultSet.getString("name");
+										ResultSet resultSet2 = st2
+												.executeQuery("SELECT * FROM categories WHERE ID = " + (rs2.getInt("category") == 0 ? " 1 OR ID = 0" : rs2.getInt("category")));
+										if (resultSet2 != null) {
+											if (resultSet2.next()) {
+												if (strRoot != null) {
+													DO.strPath = oMain.oConf.strSavepath + resultSet2.getString("path") + strRoot + "\\" + strTimestamp
+															+ strName.substring(0, strName.lastIndexOf('.')) + DO.ID + strName.substring(strName.lastIndexOf('.'));
+													aDOs.add(DO);
+													aQueue.put(DO);
+													bReturn = true;
+												}
+											} else {
+												bReturn = false;
+												break;
+											}
+										} else {
+											bReturn = false;
+											break;
+										}
+									} else {
+										bReturn = false;
+										break;
+									}
+								} catch (SQLException | InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
 						}
+					} else {
+						bReturn = false;
+						bReachedEnd = true;
+						break;
 					}
-				} else {
-					return false;
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-			} catch (SQLException e) {
-				e.printStackTrace();
+			} else {
+				bReturn = false;
+				break;
 			}
-		} else {
-			return false;
 		}
-		return false;
+		if (bReachedEnd && iCounter >= iQuerySize) {
+			return true;
+		}
+		return bReturn;
 	}
 
 	/**
