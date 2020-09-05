@@ -33,7 +33,8 @@ CREATE TABLE `posts` (
   `downloaded` tinyint(1) NOT NULL DEFAULT 0,
   `post` tinytext NOT NULL,
   `date` tinytext NOT NULL DEFAULT '',
-  `last_checked` bigint(20) NOT NULL DEFAULT 0
+  `last_checked` bigint(20) NOT NULL DEFAULT 0,
+  `failcount` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 
 CREATE TABLE `posttext` (

@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 public class Config {
-	public String strVersion = "0.6.9";
+	public String strVersion = "0.6.10";
 	// Database Configuration
 	public String strDBHost = "localhost";
 	public String strDBDatabase = "yiffparty";
@@ -55,8 +55,12 @@ public class Config {
 	// How many seconds to wait after a download has failed to continue with the
 	// next download item
 	public int iDLWFailTimeout = 1;
-	// How long to wait for a single download to retry again
-	public int iDLWRetryTimeout = (1000 * 60 * 15); // 15 minutes
+	// How long to wait for a single download to retry again, initially
+	public int iDLWRetryTimeoutInitial = (1000 * 60 * 15); // 15 minutes
+	// What is the maximum fialed download timeout?
+	public int iDLWRetryTimeoutMax = (1000 * 60 * 60 * 24); // 1 Day
+	// Multiplier on iDLWRetryTimeoutInitial, up to maximum.
+	public float fDLWRetryMultiplier = 1.5f; // 50% more per failed download
 	// Should we convert PNGs to JPegs?
 	public boolean bDLWConvertPNGs = true;
 	// Quality of the converted JPGs. 0.95f = 95% JPG Quality
@@ -111,7 +115,9 @@ public class Config {
 		sb.append("DLB:" + iDLBuffer + ls);
 		sb.append("DLBM:" + iDLBufferMultiplier + ls);
 		sb.append("DLFT:" + iDLWFailTimeout + ls);
-		sb.append("DLRT:" + iDLWRetryTimeout + ls);
+		sb.append("DLRT:" + iDLWRetryTimeoutInitial + ls);
+		sb.append("DLRTM:" + iDLWRetryTimeoutMax + ls);
+		sb.append("DLRTMULT:" + fDLWRetryMultiplier + ls);
 		sb.append("CONVERTPNG:" + (bDLWConvertPNGs ? "TRUE" : "FALSE") + ls);
 		sb.append("CVQUAL:" + fDLWJPGQuality + ls);
 		sb.append("DLAU:" + (bDLWAutoUnzip ? "TRUE" : "FALSE") + ls);
@@ -212,7 +218,13 @@ public class Config {
 					iDLWFailTimeout = Integer.parseInt(strValue);
 					break;
 				case "DLRT":
-					iDLWRetryTimeout = Integer.parseInt(strValue);
+					iDLWRetryTimeoutInitial = Integer.parseInt(strValue);
+					break;
+				case "DLRTM":
+					iDLWRetryTimeoutMax = Integer.parseInt(strValue);
+					break;
+				case "DLRTMULT":
+					fDLWRetryMultiplier = Float.parseFloat(strValue);
 					break;
 				case "CONVERTPNG":
 					bDLWConvertPNGs = strValue.equals("TRUE");

@@ -590,7 +590,8 @@ public class Main {
 	 * Update DownloadManager download buffer usage in UI
 	 */
 	public void updateDownloadBuffer() {
-		lblDownloadBuffer.setText(oDownloadManager.aDOs.size() + "/" + oDownloadManager.aQueue.size() + " - max: " + oConf.iDLBuffer);
+		lblDownloadBuffer.setText(
+				oDownloadManager.aDOs.size() + "/" + oDownloadManager.aQueue.size() + " - max: " + oConf.iDLBuffer + " | TimeoutBuffer: " + oDownloadManager.aDOsTimeout.size());
 	}
 
 	/**

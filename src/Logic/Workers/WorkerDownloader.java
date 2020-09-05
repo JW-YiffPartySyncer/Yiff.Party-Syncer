@@ -223,6 +223,12 @@ public class WorkerDownloader implements Runnable {
 		try {
 			statement.executeUpdate("UPDATE posts SET downloaded = " + (success ? "TRUE" : (fileNotFound ? "2" : "FALSE")) + ", last_checked = " + System.currentTimeMillis()
 					+ " WHERE ID = " + DO.ID);
+			if (!success) {
+				statement.executeUpdate("UPDATE posts SET failcount = failcount + 1 WHERE ID = " + DO.ID);
+			}
+			if (success) {
+				statement.executeUpdate("UPDATE posts SET failcount = 0 WHERE ID = " + DO.ID);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

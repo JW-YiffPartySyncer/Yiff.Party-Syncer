@@ -51,6 +51,8 @@ public class WorkerPatreonUpdater implements Runnable {
 	public void run() {
 		connection = OUtil.connectToMysql(oMain.oConf.strDBHost, oMain.oConf.strDBDatabase, oMain.oConf.strDBUser, oMain.oConf.strDBPassword);
 		while (true) {
+			strStatus = "Idle";
+			lTimestamp = System.currentTimeMillis();
 			bSuccess = true;
 			long limitCheck = System.currentTimeMillis() - oMain.oConf.iPatreonCheckTimeout;
 			long limitCheckFailed = System.currentTimeMillis() - oMain.oConf.iPatreonCheckFailedTimeout;
@@ -97,8 +99,6 @@ public class WorkerPatreonUpdater implements Runnable {
 				try {
 					System.out.println("WorkerPatreonUpdater: Wait " + (oMain.oConf.iPatreonWaitTimeout / 1000)
 							+ ((oMain.oConf.iPatreonWaitTimeout / 1000) == 1 ? "second" : "seconds") + " for next patreon site update");
-					strStatus = "Idle";
-					lTimestamp = System.currentTimeMillis();
 					Thread.sleep(oMain.oConf.iPatreonWaitTimeout);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -467,7 +467,8 @@ public class WorkerPatreonUpdater implements Runnable {
 
 	/**
 	 * Try and insert Post text body, if not exists
-	 * @param strID - ID of the Post on yiff.party
+	 * 
+	 * @param strID   - ID of the Post on yiff.party
 	 * @param strData - Text Body of the post message
 	 */
 	private void updatePostText(String strID, String strData) {
@@ -480,8 +481,8 @@ public class WorkerPatreonUpdater implements Runnable {
 		boolean cont = false;
 		if (ownSet != null) {
 			try {
-				if(ownSet.next()) {
-					if(ownSet.getString("text").equals("") && !strData.equals("")) {
+				if (ownSet.next()) {
+					if (ownSet.getString("text").equals("") && !strData.equals("")) {
 						cont = true;
 					}
 				} else {
@@ -491,7 +492,7 @@ public class WorkerPatreonUpdater implements Runnable {
 				e.printStackTrace();
 			}
 		}
-		if(cont) {
+		if (cont) {
 			strData = strData.replaceAll("\\\\", "\\\\\\\\");
 			strData = strData.replaceAll("'", "\\\\'");
 			try {
