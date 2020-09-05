@@ -185,7 +185,7 @@ public class WorkerDownloadManager implements Runnable {
 							if (rs2 != null) {
 								try {
 									if (rs2.next()) {
-										String strRoot = resultSet.getString("name");
+										String strRoot = rs2.getString("name");
 										ResultSet resultSet2 = st2
 												.executeQuery("SELECT * FROM categories WHERE ID = " + (rs2.getInt("category") == 0 ? " 1 OR ID = 0" : rs2.getInt("category")));
 										if (resultSet2 != null) {
