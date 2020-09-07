@@ -232,6 +232,30 @@ public class WorkerDownloader implements Runnable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM posts WHERE downloaded = TRUE");
+			if (resultSet.next()) {
+				statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'downloadedFiles'");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM posts WHERE downloaded = FALSE AND last_checked != 0");
+			if (resultSet.next()) {
+				statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'failedFiles'");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM posts WHERE downloaded = 2");
+			if (resultSet.next()) {
+				statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'fnfFiles'");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

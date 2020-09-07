@@ -104,6 +104,14 @@ public class WorkerPatreonUpdater implements Runnable {
 					e.printStackTrace();
 				}
 			}
+			try {
+				resultSet = statement.executeQuery("SELECT COUNT('ID') FROM posts");
+				if (resultSet.next()) {
+					statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'totalFiles'");
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -409,6 +417,22 @@ public class WorkerPatreonUpdater implements Runnable {
 			statement.executeUpdate("UPDATE patreons SET success = " + (success ? "TRUE" : "FALSE") + ", last_checked = " + System.currentTimeMillis() + " WHERE ID = " + iID);
 		} catch (SQLException e) {
 			bSuccess = false;
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE success = 1");
+			if (resultSet.next()) {
+				statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'syncedPatreons'");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE success = 0 AND last_checked != 0");
+			if (resultSet.next()) {
+				statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'retryPatreons'");
+			}
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}

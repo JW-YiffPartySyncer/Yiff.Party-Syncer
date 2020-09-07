@@ -42,7 +42,7 @@ public class WorkerCreatorParser implements Runnable {
 		while (true) {
 			if (statement != null) {
 				try {
-					if(statement.isClosed()) {
+					if (statement.isClosed()) {
 						statement = connection.createStatement();
 					}
 				} catch (SQLException e1) {
@@ -106,6 +106,14 @@ public class WorkerCreatorParser implements Runnable {
 					if (resultSet.getInt(1) == 0) {
 						// If the link is not present, add it to the DB and queue it for manual checking
 						statement.executeUpdate("INSERT INTO patreons (link, name, last_checked) VALUES ('" + strLink + "', '', 0)");
+						try {
+							resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 0");
+							if (resultSet.next()) {
+								statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'uncheckedPatreons'");
+							}
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}

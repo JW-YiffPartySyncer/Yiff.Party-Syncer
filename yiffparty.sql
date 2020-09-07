@@ -43,6 +43,11 @@ CREATE TABLE `posttext` (
   `text` mediumtext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 
+CREATE TABLE `stats` (
+  `entry` tinytext NOT NULL,
+  `value` tinytext DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
+
 CREATE TABLE `webrip` (
   `ID` int(11) NOT NULL,
   `Timestamp` int(11) NOT NULL,
@@ -55,7 +60,9 @@ ALTER TABLE `categories`
   ADD PRIMARY KEY (`ID`);
 
 ALTER TABLE `patreons`
-  ADD PRIMARY KEY (`ID`);
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `INDEX_SUCCESS` (`success`),
+  ADD KEY `INDEX_SUCCESS_LASTCHECKED` (`success`,`last_checked`);
 
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`ID`),
@@ -65,6 +72,9 @@ ALTER TABLE `posts`
 ALTER TABLE `posttext`
   ADD PRIMARY KEY (`ID`),
   ADD KEY `postID_Index` (`postID`(255));
+
+ALTER TABLE `stats`
+  ADD UNIQUE KEY `key` (`entry`) USING HASH;
 
 ALTER TABLE `webrip`
   ADD PRIMARY KEY (`ID`);

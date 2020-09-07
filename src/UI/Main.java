@@ -367,6 +367,90 @@ public class Main {
 		} else {
 			System.out.println("Main: Connection = null... somethings gone horribly wrong.");
 		}
+		initStats();
+	}
+
+	/**
+	 * Truncate the statistics table and populate it with current values
+	 */
+	private void initStats() {
+		try {
+			statement.executeUpdate("TRUNCATE TABLE stats");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT(ID) FROM posts");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('totalFiles', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT(ID) FROM posts WHERE downloaded = 1");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('downloadedFiles', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT(ID) FROM posts WHERE downloaded = 0 AND last_checked != 0");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('failedFiles', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT(ID) FROM posts WHERE downloaded = 2");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('fnfFiles', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 0");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('uncheckedPatreons', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 1");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('trackedPatreons', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 2");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('unwantedPatreons', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE success = 1");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('syncedPatreons', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE success = 0 AND last_checked != 0");
+			if (resultSet.next()) {
+				statement.executeUpdate("INSERT INTO stats (entry, value) VALUES ('retryPatreons', '" + resultSet.getInt(1) + "')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -404,6 +488,30 @@ public class Main {
 			try {
 				statement.executeUpdate("UPDATE patreons SET wanted = " + i + ", category = " + (i == 1 ? aComboCategoryIDs.get(comboBoxCategory.getSelectedIndex()) : 1)
 						+ " WHERE ID = " + iCurrentLink);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 1");
+				if (resultSet.next()) {
+					statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'trackedPatreons'");
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 2");
+				if (resultSet.next()) {
+					statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'unwantedPatreons'");
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				resultSet = statement.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 0");
+				if (resultSet.next()) {
+					statement.executeUpdate("UPDATE stats SET value = '" + resultSet.getInt(1) + "' WHERE entry = 'uncheckedPatreons'");
+				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -472,52 +580,38 @@ public class Main {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		if (statementOwn != null) {
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 0");
-				if (resultSetOwn.next()) {
-					sb.append("Unchecked: " + resultSetOwn.getInt(1));
+
+		try {
+			ResultSet rso = statementOwn.executeQuery("SELECT * FROM stats");
+			while (rso.next()) {
+				switch (rso.getString("entry")) {
+				case "uncheckedPatreons":
+					sb.append("Unchecked: ");
+					sb.append(rso.getInt("value"));
+					break;
+				case "trackedPatreons":
+					sb.append("| Tracking: ");
+					sb.append(rso.getInt("value"));
+					break;
+				case "unwantedPatreons":
+					sb.append("| Unwanted: ");
+					sb.append(rso.getInt("value"));
+					break;
+				case "syncedPatreons":
+					sb.append("| Status: ");
+					sb.append(rso.getInt("value"));
+					sb.append(" synced / ");
+					break;
+				case "retryPatreons":
+					sb.append(rso.getInt("value"));
+					sb.append(" retry");
+					break;
 				}
-				resultSetOwn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 1");
-				if (resultSetOwn.next()) {
-					sb.append("| Tracking: " + resultSetOwn.getInt(1));
-				}
-				resultSetOwn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE wanted = 2");
-				if (resultSetOwn.next()) {
-					sb.append("| Unwanted: " + resultSetOwn.getInt(1));
-				}
-				resultSetOwn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE success = 1");
-				if (resultSetOwn.next()) {
-					sb.append("| Status: " + resultSetOwn.getInt(1) + " synced / ");
-				}
-				resultSetOwn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM patreons WHERE success = 0 AND last_checked != 0");
-				if (resultSetOwn.next()) {
-					sb.append(resultSetOwn.getInt(1) + " retry");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
+
 		lblPatreons.setText(sb.toString());
 		try {
 			statementOwn.close();
@@ -530,52 +624,47 @@ public class Main {
 	 * Reloads file download statistics
 	 */
 	public void updateDownloads() {
-		String strResult = "";
+		StringBuilder sb = new StringBuilder();
 		Statement statementOwn = null;
 		try {
 			statementOwn = connection.createStatement();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		if (statementOwn != null) {
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM posts");
-				if (resultSetOwn.next()) {
-					strResult = strResult + "In DB: " + resultSetOwn.getInt(1);
+
+		ResultSet rso;
+		try {
+			rso = statementOwn.executeQuery("SELECT * FROM stats");
+			while (rso.next()) {
+				switch (rso.getString("entry")) {
+				case "totalFiles":
+					sb.append("In DB: ");
+					sb.append(rso.getInt("value"));
+					break;
+				case "downloadedFiles":
+					sb.append("| Downloaded: ");
+					sb.append(rso.getInt("value"));
+					break;
+				case "failedFiles":
+					sb.append("| Failed (in retry list): ");
+					sb.append(rso.getInt("value"));
+					break;
+				case "fnfFiles":
+					sb.append("| FNF: ");
+					sb.append(rso.getInt("value"));
+					break;
 				}
-				resultSetOwn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM posts WHERE downloaded = TRUE");
-				if (resultSetOwn.next()) {
-					strResult = strResult + "| Downloaded: " + resultSetOwn.getInt(1);
-				}
-				resultSetOwn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM posts WHERE downloaded = FALSE AND last_checked != 0");
-				if (resultSetOwn.next()) {
-					strResult = strResult + "| Failed (in retry list): " + resultSetOwn.getInt(1);
-				}
-				resultSetOwn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				ResultSet resultSetOwn = statementOwn.executeQuery("SELECT COUNT('ID') FROM posts WHERE downloaded = 2 AND last_checked != 0");
-				if (resultSetOwn.next()) {
-					strResult = strResult + "| FNF: " + resultSetOwn.getInt(1);
-				}
-				resultSetOwn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
-		lblDownloads.setText(strResult);
+
+		lblDownloads.setText(sb.toString());
+		try {
+			statementOwn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
